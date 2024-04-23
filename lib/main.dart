@@ -34,6 +34,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Position? _position;
+  final IsolatedJod ani = new IsolatedJod();
 
   void _getCurrentLocation() async {
     Position position = await _determinePosition();
@@ -41,15 +42,6 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _position = position;
     });
-  }
-
-  void sayHi(SendPort sendPort) {
-    print('Isolate says Hi to ');
-  }
-
-  Future<void> main() async {
-    print('here3');
-    Isolate isolate = await Isolate.spawn(sayHi, ReceivePort());
   }
 
   Future<Position> _determinePosition() async {
@@ -64,9 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    print('here1');
-    main();
-    print('here2');
+    ani.main();
 
     return await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
@@ -98,4 +88,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class isolatedJod {}
+class IsolatedJod {
+  void sayHi(String name) {
+    print('Isolate says Hi to $name');
+  }
+
+  Future<void> main() async {
+    print('here3');
+    Isolate isolate = await Isolate.spawn(sayHi, 'mike');
+  }
+}
