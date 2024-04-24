@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'dart:isolate';
+//import 'dart:isolate';
+//import 'dart:io';
 
 void main() {
   runApp(const MyApp());
@@ -34,10 +35,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   Position? _position;
-  final IsolatedJod ani = new IsolatedJod();
+  //final IsolatedJod ani = new IsolatedJod();
+
+  void startGeo() {
+    _getCurrentLocation();
+    asyncTask();
+  }
 
   void _getCurrentLocation() async {
     Position position = await _determinePosition();
+
+    print('position: ' + _position.toString());
 
     setState(() {
       _position = position;
@@ -56,10 +64,24 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    ani.main();
+    //ani.main();
+    //asyncTask();
 
     return await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+  }
+
+  void asyncTask() async {
+    print("start");
+
+    /// Waits for this 5 seconds to elapse
+    while (true) {
+      final result = await Future.delayed(Duration(seconds: 5))
+          .then((result) => _getCurrentLocation());
+    }
+
+    /// Then proceeds to run other lines of code
+    /// While waiting, this does not block off other programs running
   }
 
   @override
@@ -80,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
             : Text('No location data'),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _getCurrentLocation,
+        onPressed: startGeo,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -88,13 +110,18 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class IsolatedJod {
-  void sayHi(String name) {
-    print('Isolate says Hi to $name');
-  }
+// class IsolatedJod {
+//   void sayHi(String name) {
+//     while (true) {
+//       sleep(Duration(seconds: 3));
+//       print('Isolate says Hi to $name');
+//     }
+//   }
 
-  Future<void> main() async {
-    print('here3');
-    Isolate isolate = await Isolate.spawn(sayHi, 'mike');
-  }
-}
+//   Future<void> main() async {
+//     print('Isolate start');
+//     Isolate isolate = await Isolate.spawn(sayHi, 'mike');
+//   }
+// }
+
+
