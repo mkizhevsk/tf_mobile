@@ -1,6 +1,9 @@
 //import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:tf_mobile/screens/others.dart';
 //import 'package:flutter/widgets.dart';
+import 'screens/cards.dart';
+import 'screens/contacts.dart';
 
 void main() {
   runApp(
@@ -15,13 +18,13 @@ class MyHome extends StatefulWidget {
   State<StatefulWidget> createState() => MyHomeState();
 }
 
-class MyHomeState extends State<MyHome> with SingleTickerProviderStateMixin {
+class MyHomeState extends State<MyHome> {
   late int _currentIndex;
 
-  List<Widget> body = const [
-    Icon(Icons.home),
-    Icon(Icons.menu),
-    Icon(Icons.person),
+  List<Widget> body = [
+    CardTab(),
+    ContactTab(),
+    OtherTab(),
   ];
 
   @override
@@ -45,16 +48,16 @@ class MyHomeState extends State<MyHome> with SingleTickerProviderStateMixin {
         },
         items: const [
           BottomNavigationBarItem(
-            label: 'Home',
-            icon: Icon(Icons.home),
+            label: 'Cards',
+            icon: Icon(Icons.description),
           ),
           BottomNavigationBarItem(
-            label: 'Menu',
-            icon: Icon(Icons.menu),
-          ),
-          BottomNavigationBarItem(
-            label: 'Profile',
+            label: 'Contacts',
             icon: Icon(Icons.person),
+          ),
+          BottomNavigationBarItem(
+            label: 'Others',
+            icon: Icon(Icons.menu),
           ),
         ],
       ),

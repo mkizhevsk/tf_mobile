@@ -23,7 +23,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.tf_mobile"
+    namespace "com.mk.tf_mobile"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
