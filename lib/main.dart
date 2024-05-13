@@ -12,7 +12,7 @@ void main() {
 }
 
 class MyHome extends StatefulWidget {
-  const MyHome({Key? key}) : super(key: key);
+  const MyHome({super.key});
 
   @override
   State<StatefulWidget> createState() => MyHomeState();
@@ -22,9 +22,9 @@ class MyHomeState extends State<MyHome> {
   late int _currentIndex;
 
   List<Widget> body = [
-    CardTab(),
-    ContactTab(),
-    OtherTab(),
+    const CardTab(),
+    const ContactTab(),
+    const OtherTab(),
   ];
 
   @override

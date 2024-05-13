@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CardTab extends StatefulWidget {
-  const CardTab({Key? key}) : super(key: key);
+  const CardTab({super.key});
 
   @override
   State<StatefulWidget> createState() => CardTabState();
@@ -26,7 +26,8 @@ class CardTabState extends State<CardTab> {
             print('leading');
           },
         ),
-        title: Text('My space'),
+        title: const Text('My space'),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -41,15 +42,17 @@ class CardTabState extends State<CardTab> {
           ),
         ],
       ),
-      body: CardBody(),
+      body: const CardBody(),
     );
   }
 }
 
 class CardBody extends StatelessWidget {
+  const CardBody({super.key});
+
   @override
   Widget build(context) {
-    return Column(
+    return const Column(
       children: [
         Padding(
           padding: EdgeInsets.all(16.0),
@@ -69,12 +72,7 @@ class CardBody extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.all(16.0),
-          child: ColoredBox(
-            color: Color.fromARGB(255, 241, 232, 145),
-            child: Center(
-              child: ButtomsRow(),
-            ),
-          ),
+          child: ButtomsRow(),
         ),
       ],
     );
@@ -82,38 +80,73 @@ class CardBody extends StatelessWidget {
 }
 
 class SearchRow extends StatelessWidget {
+  const SearchRow({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Text('Search bar');
+    return const Text('search row');
   }
 }
 
 class CardRow extends StatelessWidget {
+  const CardRow({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-          'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
+    return InkWell(
+      onLongPress: () {
+        print('onLongPress');
+      },
+      child: Ink(
+        color: Color.fromARGB(255, 187, 210, 230),
+        // child: const Center(
+        //   child: Text(
+        //       'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
+        // ),
+        child: const Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                  'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean us mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
+            ),
+            Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                  'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
 
 class ButtomsRow extends StatelessWidget {
+  const ButtomsRow({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        TextButton(
-            onPressed: () {
-              print('111');
-            },
-            child: Icon(Icons.navigate_next)),
-        TextButton(
-            onPressed: () {
-              print('111');
-            },
-            child: Icon(Icons.done)),
-      ],
+    return SizedBox(
+      width: double.infinity,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextButton(
+                onPressed: () {
+                  print('111');
+                },
+                child: const Icon(Icons.navigate_next)),
+          ),
+          Expanded(
+            child: TextButton(
+                onPressed: () {
+                  print('222');
+                },
+                child: const Icon(Icons.done)),
+          ),
+        ],
+      ),
     );
   }
 }

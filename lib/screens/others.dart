@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class OtherTab extends StatelessWidget {
+  const OtherTab({super.key});
+
+  @override
   Widget build(context) {
-    return Icon(Icons.menu);
+    return const Icon(Icons.menu);
   }
 }
