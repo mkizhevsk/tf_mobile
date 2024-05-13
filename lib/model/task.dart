@@ -14,19 +14,19 @@ const List<String> taskColumns = [
   isDoneField,
 ];
 
-const String bbolType = "BOOLEAN NOT NULL";
+const String boolType = "BOOLEAN NOT NULL";
 const String idType = "INTEGER PRIMARY KEY AUTOINCREMENT";
 const String textTypeNullable = "TEXT";
 const String textType = "TEXT NOT NULL";
 
 class Task {
-  final int? id;
-  final String title;
-  final String? description;
-  final DateTime dueDate;
-  final bool isDone;
+  int? id;
+  String title;
+  String? description;
+  DateTime dueDate;
+  bool isDone;
 
-  const Task({
+  Task({
     this.id,
     required this.title,
     this.description,
@@ -42,6 +42,14 @@ class Task {
         isDone: json[isDoneField] == 1,
       );
 
+  Map<String, dynamic> toJson() => {
+        idField: id,
+        titleField: title,
+        descriptionField: description,
+        dueDateField: dueDate.toIso8601String(),
+        isDoneField: isDone ? 1 : 0,
+      };
+
   Task copyWith({
     int? id,
     String? title,
@@ -56,4 +64,9 @@ class Task {
         dueDate: dueDate ?? this.dueDate,
         isDone: isDone ?? this.isDone,
       );
+
+  @override
+  String toString() {
+    return '$id, $title, $description, $dueDate, $isDone';
+  }
 }

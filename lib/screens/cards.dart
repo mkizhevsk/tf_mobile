@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tf_mobile/database/app_database.dart';
+import 'package:tf_mobile/model/task.dart';
 
 class CardTab extends StatefulWidget {
   const CardTab({super.key});
@@ -9,10 +11,15 @@ class CardTab extends StatefulWidget {
 
 class CardTabState extends State<CardTab> {
   int cardsNumber = 0;
+  final AppDatabase db = AppDatabase.instance;
 
   @override
   void initState() {
     super.initState();
+
+    var tasks = db
+        .readAllTasks()
+        .then((tasks) => {print('initState ' + tasks.length.toString())});
   }
 
   @override
@@ -37,6 +44,16 @@ class CardTabState extends State<CardTab> {
               setState(() {
                 cardsNumber++;
                 print(cardsNumber);
+
+                var task = Task(
+                  title: 'title $cardsNumber',
+                  description: 'description $cardsNumber',
+                  dueDate: DateTime.now(),
+                  isDone: false,
+                );
+                db.createTask(task);
+
+                db.readAllTasks().then((tasks) => {print(tasks.length)});
               });
             },
           ),
@@ -71,7 +88,12 @@ class CardBody extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.only(
+            left: 10.0,
+            top: 0.0,
+            right: 10.0,
+            bottom: 0.0,
+          ),
           child: ButtomsRow(),
         ),
       ],
@@ -93,9 +115,22 @@ class CardRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppDatabase db = AppDatabase.instance;
+
     return InkWell(
       onLongPress: () {
         print('onLongPress');
+
+        // var task = getTask(1);
+        // task.then((value) => value.title = 'newTit')
+        db.readAllTasks().then((tasks) {
+          var task = tasks[1];
+          print(task);
+          task.title = 'ssss2';
+          db.updateTask(task);
+          db.readAllTasks().then((newTasks) => print(newTasks[1]));
+          db.getTask(15).then((value) => print(value));
+        });
       },
       child: Ink(
         color: const Color.fromARGB(255, 187, 210, 230),
@@ -108,12 +143,12 @@ class CardRow extends StatelessWidget {
             Padding(
               padding: EdgeInsets.all(10.0),
               child: Text(
-                  'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean us mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
+                  'Lorem ipsum dolor sit amet, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
             ),
             Padding(
               padding: EdgeInsets.all(10.0),
               child: Text(
-                  'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
+                  'Lorem ipsum dolor sit sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
             ),
           ],
         ),
