@@ -63,4 +63,28 @@ class Card {
         exampleField: example,
         statusField: status,
       };
+
+  Card copyWith({
+    int? id,
+    String? internalCode,
+    DateTime? editDateTime,
+    String? front,
+    String? back,
+    String? example,
+    int? status,
+  }) =>
+      Card(
+        id: id ?? this.id,
+        internalCode: internalCode ?? this.internalCode,
+        editDateTime: editDateTime ?? this.editDateTime,
+        front: front ?? this.front,
+        back: back ?? this.back,
+        example: example ?? this.example,
+        status: status ?? this.status,
+      );   
+
+  @override
+  String toString() {
+    return '$id, $internalCode, $, $dueDate, $isDone';
+  }       
 }
