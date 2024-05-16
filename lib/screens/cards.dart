@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tf_mobile/database/app_database.dart';
-import 'package:tf_mobile/model/task.dart';
+// import 'package:tf_mobile/model/task.dart';
+import 'package:tf_mobile/screens/card_form.dart';
 
 class CardTab extends StatefulWidget {
   const CardTab({super.key});
@@ -17,9 +18,9 @@ class CardTabState extends State<CardTab> {
   void initState() {
     super.initState();
 
-    var tasks = db
-        .readAllTasks()
-        .then((tasks) => {print('initState ' + tasks.length.toString())});
+    var cards = db
+        .getCards()
+        .then((value) => {print('initState cards ' + value.length.toString())});
   }
 
   @override
@@ -45,15 +46,18 @@ class CardTabState extends State<CardTab> {
                 cardsNumber++;
                 print(cardsNumber);
 
-                var task = Task(
-                  title: 'title $cardsNumber',
-                  description: 'description $cardsNumber',
-                  dueDate: DateTime.now(),
-                  isDone: false,
-                );
-                db.createTask(task);
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => CardForm(0)));
 
-                db.readAllTasks().then((tasks) => {print(tasks.length)});
+                // var task = Task(
+                //   title: 'title $cardsNumber',
+                //   description: 'description $cardsNumber',
+                //   dueDate: DateTime.now(),
+                //   isDone: false,
+                // );
+                // db.createTask(task);
+
+                // db.getTasks().then((tasks) => {print(tasks.length)});
               });
             },
           ),
@@ -117,20 +121,23 @@ class CardRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final AppDatabase db = AppDatabase.instance;
 
+    db.getCards().then((value) => print('cards ${value.length}'));
+
     return InkWell(
       onLongPress: () {
         print('onLongPress');
 
-        // var task = getTask(1);
-        // task.then((value) => value.title = 'newTit')
-        db.readAllTasks().then((tasks) {
-          var task = tasks[1];
-          print(task);
-          task.title = 'ssss2';
-          db.updateTask(task);
-          db.readAllTasks().then((newTasks) => print(newTasks[1]));
-          db.getTask(15).then((value) => print(value));
-        });
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => CardForm(1)));
+
+        // db.getTasks().then((tasks) {
+        //   var task = tasks[1];
+        //   print(task);
+        //   task.title = 'ssss2';
+        //   db.updateTask(task);
+        //   db.getTasks().then((newTasks) => print(newTasks[1]));
+        //   db.getTask(15).then((value) => print(value));
+        // });
       },
       child: Ink(
         color: const Color.fromARGB(255, 187, 210, 230),

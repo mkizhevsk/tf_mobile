@@ -1,23 +1,18 @@
-const String tableName = "tasks";
+const String taskTableName = "tasks";
 
-const String idField = "id";
-const String titleField = "title";
-const String descriptionField = "description";
-const String dueDateField = "due_date";
-const String isDoneField = "is_done";
+const String taskIdField = "id";
+const String taskTitleField = "title";
+const String taskDescriptionField = "description";
+const String taskDueDateField = "due_date";
+const String taskIsDoneField = "is_done";
 
 const List<String> taskColumns = [
-  idField,
-  titleField,
-  descriptionField,
-  dueDateField,
-  isDoneField,
+  taskIdField,
+  taskTitleField,
+  taskDescriptionField,
+  taskDueDateField,
+  taskIsDoneField,
 ];
-
-const String boolType = "BOOLEAN NOT NULL";
-const String idType = "INTEGER PRIMARY KEY AUTOINCREMENT";
-const String textTypeNullable = "TEXT";
-const String textType = "TEXT NOT NULL";
 
 class Task {
   int? id;
@@ -35,19 +30,19 @@ class Task {
   });
 
   static Task fromJson(Map<String, dynamic> json) => Task(
-        id: json[idField] as int?,
-        title: json[titleField] as String,
-        description: json[descriptionField] as String?,
-        dueDate: DateTime.parse(json[dueDateField] as String),
-        isDone: json[isDoneField] == 1,
+        id: json[taskIdField] as int?,
+        title: json[taskTitleField] as String,
+        description: json[taskDescriptionField] as String?,
+        dueDate: DateTime.parse(json[taskDueDateField] as String),
+        isDone: json[taskIsDoneField] == 1,
       );
 
   Map<String, dynamic> toJson() => {
-        idField: id,
-        titleField: title,
-        descriptionField: description,
-        dueDateField: dueDate.toIso8601String(),
-        isDoneField: isDone ? 1 : 0,
+        taskIdField: id,
+        taskTitleField: title,
+        taskDescriptionField: description,
+        taskDueDateField: dueDate.toIso8601String(),
+        taskIsDoneField: isDone ? 1 : 0,
       };
 
   Task copyWith({
