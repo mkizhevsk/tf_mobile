@@ -11,8 +11,11 @@ class CardTab extends StatefulWidget {
 }
 
 class CardTabState extends State<CardTab> {
+  int currentCardId = 0;
   int cardsNumber = 0;
   final AppDatabase db = AppDatabase.instance;
+
+  //set currentCardId(int val) => currentCardId = val;
 
   @override
   void initState() {

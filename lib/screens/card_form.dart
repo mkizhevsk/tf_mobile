@@ -71,6 +71,8 @@ class _CardFormState extends State<CardForm> {
                     status: 0,
                   );
                   db.createCard(card);
+
+                  //CardTabState.currentCardId = 0;
                 } else {}
 
                 //_front.text, _back.value, _example.text
