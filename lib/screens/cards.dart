@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tf_mobile/database/app_database.dart';
-// import 'package:tf_mobile/model/task.dart';
 import 'package:tf_mobile/screens/card_form.dart';
+import 'package:tf_mobile/stream_manager.dart';
+import 'package:tf_mobile/model/card.dart';
+import 'dart:async';
 
 class CardTab extends StatefulWidget {
   const CardTab({super.key});
@@ -11,23 +13,42 @@ class CardTab extends StatefulWidget {
 }
 
 class CardTabState extends State<CardTab> {
-  int currentCardId = 0;
-  int cardsNumber = 0;
+  int currentCardId = 10;
+  bool frontSide = true;
+
   final AppDatabase db = AppDatabase.instance;
 
-  //set currentCardId(int val) => currentCardId = val;
+  StreamSubscription<int>? _subscription;
 
   @override
   void initState() {
     super.initState();
+    print('initState of CardTabState');
+    // Subscribe to the cardId stream
+    _subscription = StreamManager().cardIdStream.listen((cardId) {
+      setState(() {
+        currentCardId = cardId;
+        // Handle any additional logic here, e.g., fetch card details, etc.
+        print('CardTabState Received cardId: $cardId');
+      });
+    });
+    db.getCards().then((value) {
+      for (var card in value) {
+        print(card);
+      }
+    });
+    // db.getCards().then((value) => print(value.length));
+  }
 
-    var cards = db
-        .getCards()
-        .then((value) => {print('initState cards ' + value.length.toString())});
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    print('here1 ' + currentCardId.toString());
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -46,64 +67,62 @@ class CardTabState extends State<CardTab> {
             onPressed: () {
               print('actions add');
               setState(() {
-                cardsNumber++;
-                print(cardsNumber);
-
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) => CardForm(0)));
-
-                // var task = Task(
-                //   title: 'title $cardsNumber',
-                //   description: 'description $cardsNumber',
-                //   dueDate: DateTime.now(),
-                //   isDone: false,
-                // );
-                // db.createTask(task);
-
-                // db.getTasks().then((tasks) => {print(tasks.length)});
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => CardForm(0, '', '', '')));
               });
             },
           ),
         ],
       ),
-      body: const CardBody(),
+      body: CardBody(currentCardId: currentCardId, frontSide: frontSide),
     );
   }
 }
 
 class CardBody extends StatelessWidget {
-  const CardBody({super.key});
+  final int currentCardId;
+  final bool frontSide;
+
+  const CardBody(
+      {Key? key, required this.currentCardId, required this.frontSide})
+      : super(key: key);
 
   @override
   Widget build(context) {
-    return const Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.all(16.0),
-          child: ColoredBox(
-            color: Color.fromARGB(255, 154, 243, 157),
-            child: Center(
-              child: SearchRow(),
+    print('build CardBody');
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: ColoredBox(
+              color: Color.fromARGB(255, 154, 243, 157),
+              child: Center(
+                child: SearchRow(),
+              ),
             ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.all(16.0),
-          child: ColoredBox(
-            color: Color.fromARGB(255, 187, 210, 230),
-            child: CardRow(),
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: ColoredBox(
+              color: Color.fromARGB(255, 187, 210, 230),
+              child: CardRow(
+                currentCardId: currentCardId,
+                frontSide: frontSide,
+              ),
+            ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(
-            left: 10.0,
-            top: 0.0,
-            right: 10.0,
-            bottom: 0.0,
+          Padding(
+            padding: EdgeInsets.only(
+              left: 10.0,
+              top: 0.0,
+              right: 10.0,
+              bottom: 0.0,
+            ),
+            child: ButtomsRow(),
           ),
-          child: ButtomsRow(),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -118,51 +137,59 @@ class SearchRow extends StatelessWidget {
 }
 
 class CardRow extends StatelessWidget {
-  const CardRow({super.key});
+  final int currentCardId;
+  final bool frontSide;
+
+  const CardRow(
+      {Key? key, required this.currentCardId, required this.frontSide})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    print('build CardRow ' + currentCardId.toString());
     final AppDatabase db = AppDatabase.instance;
 
-    db.getCards().then((value) => print('cards ${value.length}'));
+    return FutureBuilder<CardEntity>(
+      future: db.getCard(currentCardId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Show a loader while fetching the card
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final card = snapshot.data!;
 
-    return InkWell(
-      onLongPress: () {
-        print('onLongPress');
-
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => CardForm(1)));
-
-        // db.getTasks().then((tasks) {
-        //   var task = tasks[1];
-        //   print(task);
-        //   task.title = 'ssss2';
-        //   db.updateTask(task);
-        //   db.getTasks().then((newTasks) => print(newTasks[1]));
-        //   db.getTask(15).then((value) => print(value));
-        // });
+          return InkWell(
+            onTap: () {
+              // Add your onPressed logic here
+            },
+            onLongPress: () {
+              print('onLongPress');
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => CardForm(
+                      currentCardId, card.front!, card.back!, card.example!)));
+            },
+            child: Ink(
+              color: const Color.fromARGB(255, 187, 210, 230),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Text(frontSide ? card.front! : card.back!),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Text(frontSide ? '' : card.example!),
+                  ),
+                ],
+              ),
+            ),
+          );
+        } else {
+          // Handle the case where snapshot.data is null
+          return Text('No data available');
+        }
       },
-      child: Ink(
-        color: const Color.fromARGB(255, 187, 210, 230),
-        // child: const Center(
-        //   child: Text(
-        //       'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
-        // ),
-        child: const Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                  'Lorem ipsum dolor sit amet, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
-            ),
-            Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                  'Lorem ipsum dolor sit sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

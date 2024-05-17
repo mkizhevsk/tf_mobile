@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:tf_mobile/screens/cards.dart';
 import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/model/card.dart';
+import 'package:tf_mobile/stream_manager.dart';
+import 'package:tf_mobile/utils/string_random_generator.dart';
+import 'package:tf_mobile/main.dart';
 
 class CardForm extends StatefulWidget {
-  int cardId;
+  final int cardId;
+  final String front;
+  final String back;
+  final String example;
 
-  CardForm(this.cardId);
+  CardForm(this.cardId, this.front, this.back, this.example);
 
   @override
   State<StatefulWidget> createState() => _CardFormState();
@@ -14,76 +20,108 @@ class CardForm extends StatefulWidget {
 
 class _CardFormState extends State<CardForm> {
   final AppDatabase db = AppDatabase.instance;
-  TextEditingController _front = new TextEditingController();
-  TextEditingController _back = new TextEditingController();
-  TextEditingController _example = new TextEditingController();
+  final TextEditingController _front = TextEditingController();
+  final TextEditingController _back = TextEditingController();
+  final TextEditingController _example = TextEditingController();
+
+  late final CardEntity card;
+
+  static const double paddingValue = 8.0;
+
+  @override
+  void dispose() {
+    _front.dispose();
+    _back.dispose();
+    _example.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _front.text = widget.front;
+    _back.text = widget.back;
+    _example.text = widget.example;
+  }
 
   @override
   Widget build(BuildContext context) {
     print('cardId ${widget.cardId}');
 
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _front,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Front',
+      body: Padding(
+        padding: const EdgeInsets.all(paddingValue),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(paddingValue),
+              child: TextField(
+                controller: _front,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Front',
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _back,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Back',
+            Padding(
+              padding: const EdgeInsets.all(paddingValue),
+              child: TextField(
+                controller: _back,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Back',
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _example,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Example',
+            Padding(
+              padding: const EdgeInsets.all(paddingValue),
+              child: TextField(
+                controller: _example,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Example',
+                ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          ElevatedButton(
-              onPressed: () {
+            const SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                //CardEntity savedCard;
+                print('widget.cardId ' + widget.cardId.toString());
+                int cardId;
                 if (widget.cardId == 0) {
                   var card = CardEntity(
-                    internalCode: '123456',
+                    internalCode: StringRandomGenerator.instance.getValue(),
                     editDateTime: DateTime.now(),
                     front: _front.text,
                     back: _back.text,
                     example: _example.text,
                     status: 0,
                   );
-                  db.createCard(card);
+                  var newCard = await db.createCard(card);
+                  cardId = newCard.id!;
+                } else {
+                  var updatedCard = await db.getCard(widget.cardId);
+                  updatedCard.front = _front.text;
+                  updatedCard.back = _back.text;
+                  updatedCard.example = _example.text;
+                  cardId = await db.updateCardOld(updatedCard);
+                }
 
-                  //CardTabState.currentCardId = 0;
-                } else {}
+                StreamManager().cardIdSink.add(cardId);
 
-                //_front.text, _back.value, _example.text
-
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => CardTab()),
+                // Navigate to another screen
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => MyHome()),
                 );
-                //CardTab();
               },
-              child: Text('Submit')),
-        ],
+              child: Text('Submit'),
+            ),
+          ],
+        ),
       ),
     );
   }

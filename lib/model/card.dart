@@ -1,5 +1,3 @@
-//import 'package:flutter/foundation.dart';
-
 const String cardTableName = "card";
 
 const String cardIdField = "id";
@@ -20,15 +18,10 @@ const List<String> cardColumns = [
   cardStatusField,
 ];
 
-// const String idType = "INTEGER PRIMARY KEY AUTOINCREMENT";
-// const String textTypeNullable = "TEXT";
-// const String textType = "TEXT NOT NULL";
-//
-
 class CardEntity {
   int? id;
-  String internalCode;
-  DateTime editDateTime;
+  late String internalCode;
+  late DateTime editDateTime;
   String? front;
   String? back;
   String? example;
@@ -44,8 +37,10 @@ class CardEntity {
     this.status,
   });
 
+  CardEntity.empty();
+
   static CardEntity fromJson(Map<String, dynamic> json) => CardEntity(
-        id: json[cardIdField] as int?,
+        id: json[cardIdField] as int,
         internalCode: json[cardInternalCodeField] as String,
         editDateTime: DateTime.parse(json[cardEditDateTimeField] as String),
         front: json[cardFrontField] as String?,

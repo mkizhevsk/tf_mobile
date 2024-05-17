@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:tf_mobile/model/task.dart';
 import 'package:tf_mobile/model/card.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
+// import 'package:tf_mobile/utils/string_random_generator.dart';
 
 const String fileName = "tasks_database.db";
 
@@ -69,7 +70,7 @@ class AppDatabase {
     return result.map((json) => CardEntity.fromJson(json)).toList();
   }
 
-  Future<int> updateCard(CardEntity card) async {
+  Future<int> updateCardOld(CardEntity card) async {
     final db = await instance.database;
     return await db.update(
       cardTableName,

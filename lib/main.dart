@@ -1,9 +1,9 @@
-//import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:tf_mobile/screens/others.dart';
-//import 'package:flutter/widgets.dart';
 import 'screens/cards.dart';
 import 'screens/contacts.dart';
+import 'package:tf_mobile/stream_manager.dart';
+import 'dart:async';
 
 void main() {
   runApp(
@@ -20,6 +20,9 @@ class MyHome extends StatefulWidget {
 
 class MyHomeState extends State<MyHome> {
   late int _currentIndex;
+  int cardTabCardId = 0;
+
+  StreamSubscription<int>? _subscription;
 
   List<Widget> body = [
     const CardTab(),
@@ -31,6 +34,13 @@ class MyHomeState extends State<MyHome> {
   void initState() {
     super.initState();
     _currentIndex = 0;
+    print('initState of MyHomeState');
+    _subscription = StreamManager().cardIdStream.listen((cardId) {
+      setState(() {
+        cardTabCardId = cardId;
+        print('MyHomeState Received cardId: $cardId');
+      });
+    });
   }
 
   @override
