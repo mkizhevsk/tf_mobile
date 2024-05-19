@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tf_mobile/screens/cards.dart';
+// import 'package:tf_mobile/screens/cards.dart';
 import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/model/card.dart';
 import 'package:tf_mobile/stream_manager.dart';
@@ -12,7 +12,7 @@ class CardForm extends StatefulWidget {
   final String back;
   final String example;
 
-  CardForm(this.cardId, this.front, this.back, this.example);
+  const CardForm(this.cardId, this.front, this.back, this.example, {super.key});
 
   @override
   State<StatefulWidget> createState() => _CardFormState();
@@ -46,7 +46,7 @@ class _CardFormState extends State<CardForm> {
 
   @override
   Widget build(BuildContext context) {
-    print('cardId ${widget.cardId}');
+    // print('cardId ${widget.cardId}');
 
     return Scaffold(
       body: Padding(
@@ -89,8 +89,7 @@ class _CardFormState extends State<CardForm> {
             ),
             ElevatedButton(
               onPressed: () async {
-                //CardEntity savedCard;
-                print('widget.cardId ' + widget.cardId.toString());
+                // print('widget.cardId ' + widget.cardId.toString());
                 int cardId;
                 if (widget.cardId == 0) {
                   var card = CardEntity(
@@ -115,10 +114,10 @@ class _CardFormState extends State<CardForm> {
 
                 // Navigate to another screen
                 Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => MyHome()),
+                  MaterialPageRoute(builder: (context) => const MyHome()),
                 );
               },
-              child: Text('Submit'),
+              child: const Text('Submit'),
             ),
           ],
         ),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/screens/card_form.dart';
 import 'package:tf_mobile/stream_manager.dart';
-import 'package:tf_mobile/model/card.dart';
+import 'package:tf_mobile/screens/card_row.dart';
 import 'dart:async';
 
 class CardTab extends StatefulWidget {
@@ -18,37 +18,36 @@ class CardTabState extends State<CardTab> {
 
   final AppDatabase db = AppDatabase.instance;
 
-  StreamSubscription<int>? _subscription;
+  StreamSubscription<int>? _cardIdSubscription;
 
   @override
   void initState() {
     super.initState();
     print('initState of CardTabState');
-    // Subscribe to the cardId stream
-    _subscription = StreamManager().cardIdStream.listen((cardId) {
+
+    _cardIdSubscription = StreamManager().cardIdStream.listen((cardId) {
       setState(() {
         currentCardId = cardId;
-        // Handle any additional logic here, e.g., fetch card details, etc.
         print('CardTabState Received cardId: $cardId');
       });
     });
-    db.getCards().then((value) {
-      for (var card in value) {
-        print(card);
-      }
-    });
-    // db.getCards().then((value) => print(value.length));
+
+    // db.getCards().then((value) {
+    //   for (var card in value) {
+    //     print(card);
+    //   }
+    // });
   }
 
   @override
   void dispose() {
-    _subscription?.cancel();
+    _cardIdSubscription?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    print('here1 ' + currentCardId.toString());
+    print('build CardTabState with currentCardId $currentCardId');
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -68,60 +67,60 @@ class CardTabState extends State<CardTab> {
               print('actions add');
               setState(() {
                 Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => CardForm(0, '', '', '')));
+                    builder: (context) => const CardForm(0, '', '', '')));
               });
             },
           ),
         ],
       ),
-      body: CardBody(currentCardId: currentCardId, frontSide: frontSide),
+      body: CardBody(
+        currentCardId: currentCardId,
+      ),
     );
   }
 }
 
 class CardBody extends StatelessWidget {
   final int currentCardId;
-  final bool frontSide;
 
-  const CardBody(
-      {Key? key, required this.currentCardId, required this.frontSide})
-      : super(key: key);
+  const CardBody({super.key, required this.currentCardId});
 
   @override
   Widget build(context) {
     print('build CardBody');
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: ColoredBox(
-              color: Color.fromARGB(255, 154, 243, 157),
-              child: Center(
-                child: SearchRow(),
+    return Scaffold(
+      backgroundColor:
+          Colors.grey[200], // Light grey background for the whole screen
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: ColoredBox(
+                color: Color.fromARGB(255, 154, 243, 157),
+                child: Center(
+                  child: SearchRow(),
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: ColoredBox(
-              color: Color.fromARGB(255, 187, 210, 230),
-              child: CardRow(
-                currentCardId: currentCardId,
-                frontSide: frontSide,
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ColoredBox(
+                color: const Color.fromARGB(255, 187, 210, 230),
+                child: CardRow(currentCardId),
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(
-              left: 10.0,
-              top: 0.0,
-              right: 10.0,
-              bottom: 0.0,
+            const Padding(
+              padding: EdgeInsets.only(
+                left: 10.0,
+                top: 0.0,
+                right: 10.0,
+                bottom: 0.0,
+              ),
+              child: ButtomsRow(),
             ),
-            child: ButtomsRow(),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -133,64 +132,6 @@ class SearchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Text('search row');
-  }
-}
-
-class CardRow extends StatelessWidget {
-  final int currentCardId;
-  final bool frontSide;
-
-  const CardRow(
-      {Key? key, required this.currentCardId, required this.frontSide})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    print('build CardRow ' + currentCardId.toString());
-    final AppDatabase db = AppDatabase.instance;
-
-    return FutureBuilder<CardEntity>(
-      future: db.getCard(currentCardId),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Show a loader while fetching the card
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          final card = snapshot.data!;
-
-          return InkWell(
-            onTap: () {
-              // Add your onPressed logic here
-            },
-            onLongPress: () {
-              print('onLongPress');
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => CardForm(
-                      currentCardId, card.front!, card.back!, card.example!)));
-            },
-            child: Ink(
-              color: const Color.fromARGB(255, 187, 210, 230),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(frontSide ? card.front! : card.back!),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text(frontSide ? '' : card.example!),
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else {
-          // Handle the case where snapshot.data is null
-          return Text('No data available');
-        }
-      },
-    );
   }
 }
 

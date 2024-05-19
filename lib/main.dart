@@ -22,7 +22,7 @@ class MyHomeState extends State<MyHome> {
   late int _currentIndex;
   int cardTabCardId = 0;
 
-  StreamSubscription<int>? _subscription;
+  StreamSubscription<int>? _cardIdSubscription;
 
   List<Widget> body = [
     const CardTab(),
@@ -32,15 +32,22 @@ class MyHomeState extends State<MyHome> {
 
   @override
   void initState() {
+    print('initState of MyHomeState');
     super.initState();
     _currentIndex = 0;
-    print('initState of MyHomeState');
-    _subscription = StreamManager().cardIdStream.listen((cardId) {
+
+    _cardIdSubscription = StreamManager().cardIdStream.listen((cardId) {
       setState(() {
         cardTabCardId = cardId;
         print('MyHomeState Received cardId: $cardId');
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _cardIdSubscription?.cancel();
+    super.dispose();
   }
 
   @override
