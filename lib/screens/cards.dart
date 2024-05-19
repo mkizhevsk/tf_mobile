@@ -3,6 +3,7 @@ import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/screens/card_form.dart';
 import 'package:tf_mobile/stream_manager.dart';
 import 'package:tf_mobile/screens/card_row.dart';
+import 'package:tf_mobile/screens/card_new.dart';
 import 'dart:async';
 
 class CardTab extends StatefulWidget {
@@ -88,6 +89,7 @@ class CardBody extends StatelessWidget {
   @override
   Widget build(context) {
     print('build CardBody');
+
     return Scaffold(
       backgroundColor:
           Colors.grey[200], // Light grey background for the whole screen
@@ -103,11 +105,15 @@ class CardBody extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ColoredBox(
-                color: const Color.fromARGB(255, 187, 210, 230),
-                child: CardRow(currentCardId),
+            SizedBox(
+              height: 300,
+              width: double.infinity,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ColoredBox(
+                  color: const Color.fromARGB(255, 187, 210, 230),
+                  child: CardRowNew(), //CardRow(currentCardId),
+                ),
               ),
             ),
             const Padding(

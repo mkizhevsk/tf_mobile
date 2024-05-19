@@ -30,6 +30,7 @@ class CardRowState extends State<CardRow> {
     return FutureBuilder<CardEntity>(
       future: db.getCard(currentCardId),
       builder: (context, snapshot) {
+        print('build CardRowState');
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator(); // Show a loader while fetching the card
         } else if (snapshot.hasError) {
