@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/screens/card_form.dart';
 import 'package:tf_mobile/stream_manager.dart';
-import 'package:tf_mobile/screens/card_row.dart';
+// import 'package:tf_mobile/screens/card_row.dart';
 import 'package:tf_mobile/screens/card_new.dart';
+import 'package:tf_mobile/design/colors.dart';
 import 'dart:async';
 
 class CardTab extends StatefulWidget {
@@ -91,8 +92,7 @@ class CardBody extends StatelessWidget {
     print('build CardBody');
 
     return Scaffold(
-      backgroundColor:
-          Colors.grey[200], // Light grey background for the whole screen
+      backgroundColor: greyCardBodyBackground,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -111,8 +111,8 @@ class CardBody extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ColoredBox(
-                  color: const Color.fromARGB(255, 187, 210, 230),
-                  child: CardRowNew(), //CardRow(currentCardId),
+                  color: greyCardBodyBackground,
+                  child: CardRowNew(c), //CardRow(currentCardId),
                 ),
               ),
             ),

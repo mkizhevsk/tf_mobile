@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+//import 'package:flutter/widgets.dart';
+import 'package:tf_mobile/design/colors.dart';
+import 'package:tf_mobile/screens/card_form.dart';
 
 class CardRowNew extends StatefulWidget {
-  CardRowNew({super.key});
+  final int cardId;
+  final String front;
+  final String back;
+  final String example;
+
+  CardRowNew(
+      {required this.cardId,
+      required this.front,
+      required this.back,
+      required this.example,
+      super.key});
 
   @override
   State<StatefulWidget> createState() => CardRowNewState();
@@ -19,10 +31,10 @@ class CardRowNewState extends State<CardRowNew> {
 
   @override
   Widget build(BuildContext context) {
-    final String _front = 'kfsaf jkjj kkjkkjkj kjkj';
-    final String _back = 'kjkjadjjk kjjj vtyt 0909 jknj';
-    final String _example =
-        'kjklj 98900 oijljlkjl jkljl ljlk ljljk xdxese sfsf 9090 9cb9 oi o i0 090 9 ipiopi i pi ends';
+    // final String _front = widget.front;
+    // final String _back = 'kjkjadjjk kjjj vtyt 0909 jknj';
+    // final String _example =
+    //     'kjklj 98900 oijljlkjl jkljl ljlk ljljk xdxese sfsf 9090 9cb9 oi o i0 090 9 ipiopi i pi ends';
 
     return GestureDetector(
       onTap: () {
@@ -30,8 +42,16 @@ class CardRowNewState extends State<CardRowNew> {
           frontSide = !frontSide;
         });
       },
+      onLongPress: () {
+        // print('onLongPress');
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => CardForm(
+                widget.cardId, widget.front, widget.back, widget.example)));
+      },
       child: Card(
-        child: frontSide ? _oneText(_front) : _twoTexts(_back, _example),
+        child: frontSide
+            ? _oneText(widget.front)
+            : _twoTexts(widget.back, widget.example),
       ),
     );
   }
@@ -58,32 +78,46 @@ class CardRowNewState extends State<CardRowNew> {
       children: [
         Expanded(
           child: Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8.0),
+            decoration: const BoxDecoration(
+              color: whiteCardTextBackground,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8.0),
+                topRight: Radius.circular(8.0),
+              ),
             ),
             alignment: Alignment.center,
             padding: const EdgeInsets.only(
-                left: 8.0, right: 8.0, top: 8.0, bottom: 0.0),
+              left: 16.0,
+              right: 16.0,
+              top: 16.0,
+              bottom: 0.0,
+            ),
             child: Text(
               text1,
               style: TextStyle(fontSize: 18),
             ),
           ),
         ),
-        SizedBox(height: 8), // Added spacing between containers
         Expanded(
           child: Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(8.0),
+            decoration: const BoxDecoration(
+              color: whiteCardTextBackground,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(8.0),
+                bottomRight: Radius.circular(8.0),
+              ),
             ),
             alignment: Alignment.center,
             padding: const EdgeInsets.only(
-                left: 8.0, right: 8.0, top: 0.0, bottom: 8.0),
+              left: 16.0,
+              right: 16.0,
+              top: 0.0,
+              bottom: 16.0,
+            ),
             child: Text(
               text2,
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(
+                  color: Color.fromARGB(255, 75, 75, 75), fontSize: 18),
             ),
           ),
         ),
