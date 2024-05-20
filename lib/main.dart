@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tf_mobile/screens/others.dart';
-import 'screens/cards.dart';
+import 'screens/card_tab.dart';
 import 'screens/contacts.dart';
 import 'package:tf_mobile/stream_manager.dart';
 import 'dart:async';

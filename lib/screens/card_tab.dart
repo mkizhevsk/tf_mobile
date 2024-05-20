@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/model/card.dart';
 import 'package:tf_mobile/screens/card_form.dart';
-// import 'package:tf_mobile/stream_manager.dart';
+import 'package:tf_mobile/stream_manager.dart';
 // import 'package:tf_mobile/screens/card_row.dart';
-import 'package:tf_mobile/screens/card_new.dart';
+import 'package:tf_mobile/screens/card_row.dart';
 import 'package:tf_mobile/design/colors.dart';
 import 'dart:async';
 
@@ -18,17 +18,33 @@ class CardTab extends StatefulWidget {
 class CardTabState extends State<CardTab> {
   late AppDatabase db;
   late Future<CardEntity> cardFuture;
+  int _cardId = 0;
+
+  StreamSubscription<int>? _cardIdSubscription;
 
   @override
   void initState() {
     print('initState of CardTabState');
     super.initState();
     db = AppDatabase.instance;
+
+    _cardIdSubscription = StreamManager().cardIdStream.listen((cardId) {
+      print('CardTabState Received cardId: $cardId');
+      setState(() {
+        _cardId = cardId;
+      });
+    });
+
     _fetchCard();
   }
 
   Future<void> _fetchCard() async {
-    cardFuture = db.getCard(2);
+    print('_fetchCard');
+    try {
+      cardFuture = _cardId == 0 ? db.getCardToLearn() : db.getCard(_cardId);
+    } catch (e) {
+      cardFuture = Future.error('No unlearned cards available');
+    }
   }
 
   @override
@@ -121,7 +137,7 @@ class CardBody extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: ColoredBox(
                   color: greyCardBodyBackground,
-                  child: CardRowNew(
+                  child: CardRow(
                       cardId: cardId,
                       front: front,
                       back: back,

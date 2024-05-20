@@ -1,205 +1,120 @@
 import 'package:flutter/material.dart';
-import 'package:tf_mobile/database/app_database.dart';
-import 'package:tf_mobile/model/card.dart';
+import 'package:tf_mobile/design/colors.dart';
 import 'package:tf_mobile/screens/card_form.dart';
 
 class CardRow extends StatefulWidget {
-  late int cardId;
+  final int cardId;
+  final String front;
+  final String back;
+  final String example;
 
-  CardRow(this.cardId, {super.key});
+  CardRow(
+      {required this.cardId,
+      required this.front,
+      required this.back,
+      required this.example,
+      super.key});
 
   @override
   State<StatefulWidget> createState() => CardRowState();
 }
 
 class CardRowState extends State<CardRow> {
-  late final int currentCardId;
   late bool frontSide;
 
   @override
   void initState() {
     super.initState();
     frontSide = true;
-    currentCardId = widget.cardId;
   }
 
   @override
   Widget build(BuildContext context) {
-    final AppDatabase db = AppDatabase.instance;
-
-    return FutureBuilder<CardEntity>(
-      future: db.getCard(currentCardId),
-      builder: (context, snapshot) {
-        print('build CardRowState');
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(); // Show a loader while fetching the card
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          final card = snapshot.data!;
-
-          return Card(
-            child: InkWell(
-              onTap: () {
-                setState(() {
-                  frontSide = !frontSide;
-                });
-              },
-              onLongPress: () {
-                // print('onLongPress');
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => CardForm(currentCardId, card.front!,
-                        card.back!, card.example!)));
-              },
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: double.infinity,
-                      child: Text(
-                        frontSide ? card.front! : card.back!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 24.0), // Enlarged font size
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: double.infinity,
-                      child: Text(
-                        frontSide ? '' : card.example!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            fontSize: 20.0), // Enlarged font size
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-
-          // return InkWell(
-          // onTap: () {
-          //   setState(() {
-          //     frontSide = !frontSide;
-          //   });
-          // },
-          // onLongPress: () {
-          //   // print('onLongPress');
-          //   Navigator.of(context).push(MaterialPageRoute(
-          //       builder: (context) => CardForm(
-          //           currentCardId, card.front!, card.back!, card.example!)));
-          // },
-          //   child: Card(
-          //     child: Column(
-          //       children: <Widget>[
-          //         Padding(
-          //           padding: const EdgeInsets.all(8.0),
-          //           child: Container(
-          //             width: double.infinity,
-          //             child: Text(
-          //               frontSide ? card.front! : card.back!,
-          //               textAlign: TextAlign.center,
-          //               style: const TextStyle(
-          //                   fontSize: 24.0), // Enlarged font size
-          //             ),
-          //           ),
-          //         ),
-          //         Padding(
-          //           padding: const EdgeInsets.all(8.0),
-          //           child: Container(
-          //             width: double.infinity,
-          //             child: Text(
-          //               frontSide ? '' : card.example!,
-          //               textAlign: TextAlign.center,
-          //               style: const TextStyle(
-          //                   fontSize: 20.0), // Enlarged font size
-          //             ),
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-
-          // Ink(
-          //   color: const Color.fromARGB(255, 187, 210, 230),
-          // child: Column(
-          //   children: [
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: Container(
-          //     width: double.infinity,
-          //     child: Text(
-          //       frontSide ? card.front! : card.back!,
-          //       textAlign: TextAlign.center,
-          //       style: const TextStyle(
-          //           fontSize: 24.0), // Enlarged font size
-          //     ),
-          //   ),
-          // ),
-          //     Padding(
-          //       padding: const EdgeInsets.all(8.0),
-          //       child: Container(
-          //         width: double.infinity,
-          //         child: Text(
-          //           frontSide ? '' : card.example!,
-          //           textAlign: TextAlign.center,
-          //           style: const TextStyle(
-          //               fontSize: 20.0), // Enlarged font size
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(8.0),
-          //     child: SizedBox(
-          //       height: 100.0, // Set a fixed height for the text container
-          //       width: double.infinity,
-          //       child: Center(
-          //         child: AnimatedSwitcher(
-          //           duration: const Duration(milliseconds: 300),
-          //           transitionBuilder:
-          //               (Widget child, Animation<double> animation) {
-          //             return FadeTransition(opacity: animation, child: child);
-          //           },
-          //           child: Text(
-          //             frontSide ? card.front! : card.back!,
-          //             key: ValueKey<bool>(frontSide),
-          //             textAlign: TextAlign.center,
-          //             style: const TextStyle(
-          //                 fontSize: 24.0), // Enlarged font size
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          // );
-        } else {
-          // Handle the case where snapshot.data is null
-          return const Text('No data available');
-        }
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          frontSide = !frontSide;
+        });
       },
+      onLongPress: () {
+        // print('onLongPress');
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => CardForm(
+                widget.cardId, widget.front, widget.back, widget.example)));
+      },
+      child: Card(
+        child: frontSide
+            ? _oneText(widget.front)
+            : _twoTexts(widget.back, widget.example),
+      ),
     );
   }
 
-  // Widget _oneText() {
-  //   return Padding(
-  //               padding: const EdgeInsets.all(8.0),
-  //               child: Container(
-  //                 width: double.infinity,
-  //                 child: Text(
-  //                   frontSide ? card.front! : card.back!,
-  //                   textAlign: TextAlign.center,
-  //                   style: const TextStyle(
-  //                       fontSize: 24.0), // Enlarged font size
-  //                 ),
-  //               ),
-  //             ),
-  // }
+  Widget _oneText(String text) {
+    return Center(
+      child: Container(
+        decoration: BoxDecoration(
+          color: whiteCardTextBackground,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        padding: const EdgeInsets.all(8.0),
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 18),
+        ),
+      ),
+    );
+  }
+
+  Widget _twoTexts(String text1, String text2) {
+    return Column(
+      children: [
+        Expanded(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: whiteCardTextBackground,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(8.0),
+                topRight: Radius.circular(8.0),
+              ),
+            ),
+            alignment: Alignment.center,
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 16.0,
+              bottom: 0.0,
+            ),
+            child: Text(
+              text1,
+              style: const TextStyle(color: cardTextFont, fontSize: 18),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: whiteCardTextBackground,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(8.0),
+                bottomRight: Radius.circular(8.0),
+              ),
+            ),
+            alignment: Alignment.center,
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 0.0,
+              bottom: 16.0,
+            ),
+            child: Text(
+              text2,
+              style: const TextStyle(color: cardTextFont, fontSize: 18),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

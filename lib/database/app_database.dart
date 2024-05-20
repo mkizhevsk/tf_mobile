@@ -70,6 +70,36 @@ class AppDatabase {
     return result.map((json) => CardEntity.fromJson(json)).toList();
   }
 
+  Future<CardEntity> getCardToLearn() async {
+    print('getCardToLearn');
+    var cards = await getCards();
+    print(cards.length);
+    for (var card in cards) {
+      print(card);
+    }
+    var currentDate = DateTime.now();
+    var formattedCurrentDate =
+        DateTime(currentDate.year, currentDate.month, currentDate.day);
+
+    var unlearnedCards = cards
+        .where((card) => card.status == constants.cardIsNotLearned)
+        .where((card) => !isSameDay(card.editDateTime, formattedCurrentDate))
+        .toList();
+    print(unlearnedCards.length);
+    unlearnedCards.sort((a, b) => a.editDateTime.compareTo(b.editDateTime));
+    if (unlearnedCards.isNotEmpty) {
+      return unlearnedCards.first;
+    } else {
+      throw Exception('No unlearned cards available');
+    }
+  }
+
+  bool isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
   Future<int> updateCardOld(CardEntity card) async {
     final db = await instance.database;
     return await db.update(

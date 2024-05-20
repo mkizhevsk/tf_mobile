@@ -104,6 +104,7 @@ class _CardFormState extends State<CardForm> {
                   cardId = newCard.id!;
                 } else {
                   var updatedCard = await db.getCard(widget.cardId);
+                  updatedCard.editDateTime = DateTime.now();
                   updatedCard.front = _front.text;
                   updatedCard.back = _back.text;
                   updatedCard.example = _example.text;
