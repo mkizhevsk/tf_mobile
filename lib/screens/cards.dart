@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tf_mobile/database/app_database.dart';
+import 'package:tf_mobile/model/card.dart';
 import 'package:tf_mobile/screens/card_form.dart';
-import 'package:tf_mobile/stream_manager.dart';
+// import 'package:tf_mobile/stream_manager.dart';
 // import 'package:tf_mobile/screens/card_row.dart';
 import 'package:tf_mobile/screens/card_new.dart';
 import 'package:tf_mobile/design/colors.dart';
@@ -15,46 +16,27 @@ class CardTab extends StatefulWidget {
 }
 
 class CardTabState extends State<CardTab> {
-  int currentCardId = 10;
-  bool frontSide = true;
-
-  final AppDatabase db = AppDatabase.instance;
-
-  StreamSubscription<int>? _cardIdSubscription;
+  late AppDatabase db;
+  late Future<CardEntity> cardFuture;
 
   @override
   void initState() {
-    super.initState();
     print('initState of CardTabState');
-
-    _cardIdSubscription = StreamManager().cardIdStream.listen((cardId) {
-      setState(() {
-        currentCardId = cardId;
-        print('CardTabState Received cardId: $cardId');
-      });
-    });
-
-    // db.getCards().then((value) {
-    //   for (var card in value) {
-    //     print(card);
-    //   }
-    // });
+    super.initState();
+    db = AppDatabase.instance;
+    _fetchCard();
   }
 
-  @override
-  void dispose() {
-    _cardIdSubscription?.cancel();
-    super.dispose();
+  Future<void> _fetchCard() async {
+    cardFuture = db.getCard(2);
   }
 
   @override
   Widget build(BuildContext context) {
-    print('build CardTabState with currentCardId $currentCardId');
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.menu),
-          // tooltip: 'Show Snackbar',
           onPressed: () {
             print('leading');
           },
@@ -67,25 +49,52 @@ class CardTabState extends State<CardTab> {
             tooltip: 'Add card',
             onPressed: () {
               print('actions add');
-              setState(() {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const CardForm(0, '', '', '')));
-              });
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CardForm(0, '', '', ''),
+                ),
+              );
             },
           ),
         ],
       ),
-      body: CardBody(
-        currentCardId: currentCardId,
+      body: FutureBuilder<CardEntity>(
+        future: cardFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Text(''); //Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text('No data found'));
+          } else {
+            final card = snapshot.data!;
+
+            return CardBody(
+                cardId: card.id!,
+                front: card.front!,
+                back: card.back!,
+                example: card.example!);
+          }
+        },
       ),
     );
   }
 }
 
 class CardBody extends StatelessWidget {
-  final int currentCardId;
+  final int cardId;
+  final String front;
+  final String back;
+  final String example;
 
-  const CardBody({super.key, required this.currentCardId});
+  const CardBody({
+    super.key,
+    required this.cardId,
+    required this.front,
+    required this.back,
+    required this.example,
+  });
 
   @override
   Widget build(context) {
@@ -112,7 +121,11 @@ class CardBody extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: ColoredBox(
                   color: greyCardBodyBackground,
-                  child: CardRowNew(c), //CardRow(currentCardId),
+                  child: CardRowNew(
+                      cardId: cardId,
+                      front: front,
+                      back: back,
+                      example: example),
                 ),
               ),
             ),
