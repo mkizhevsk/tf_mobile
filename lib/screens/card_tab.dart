@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/model/card.dart';
 import 'package:tf_mobile/screens/card_form.dart';
@@ -52,11 +53,27 @@ class CardTabState extends State<CardTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
+        leading: PopupMenuButton<int>(
           icon: const Icon(Icons.menu),
-          onPressed: () {
-            print('leading');
+          onSelected: (value) {
+            // Handle menu item selection here
+            if (value == 1) {
+              print('Item 1 selected');
+            } else if (value == 2) {
+              // Exit the app
+              SystemNavigator.pop();
+            }
           },
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 1,
+              child: Text('Item 1'),
+            ),
+            PopupMenuItem(
+              value: 2,
+              child: Text('Exit'),
+            ),
+          ],
         ),
         title: const Text('My space'),
         centerTitle: true,
@@ -118,17 +135,14 @@ class CardBody extends StatelessWidget {
     print('build CardBody');
 
     return Scaffold(
-      backgroundColor: greyCardBodyBackground,
+      backgroundColor: cardBodyBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           children: [
             const Padding(
               padding: EdgeInsets.all(16.0),
-              child: ColoredBox(
-                color: Color.fromARGB(255, 154, 243, 157),
-                child: Center(
-                  child: SearchRow(),
-                ),
+              child: Center(
+                child: SearchRow(),
               ),
             ),
             SizedBox(
@@ -137,7 +151,7 @@ class CardBody extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: ColoredBox(
-                  color: greyCardBodyBackground,
+                  color: cardBodyBackgroundColor,
                   child: CardRow(
                       cardId: cardId,
                       front: front,
@@ -167,7 +181,31 @@ class SearchRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text('search row');
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'Search...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: searchBackgroundColor,
+              ),
+              onChanged: (query) {
+                // Handle the search logic here
+                print('Search query: $query');
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

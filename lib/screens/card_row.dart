@@ -54,7 +54,7 @@ class CardRowState extends State<CardRow> {
     return Center(
       child: Container(
         decoration: BoxDecoration(
-          color: whiteCardTextBackground,
+          color: cardContentBackgroundColor,
           borderRadius: BorderRadius.circular(8.0),
         ),
         padding: const EdgeInsets.all(8.0),
@@ -73,7 +73,7 @@ class CardRowState extends State<CardRow> {
         Expanded(
           child: Container(
             decoration: const BoxDecoration(
-              color: whiteCardTextBackground,
+              color: cardContentBackgroundColor,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(8.0),
                 topRight: Radius.circular(8.0),
@@ -88,14 +88,14 @@ class CardRowState extends State<CardRow> {
             ),
             child: Text(
               text1,
-              style: const TextStyle(color: cardTextFont, fontSize: 18),
+              style: const TextStyle(color: cardContentFontColor, fontSize: 18),
             ),
           ),
         ),
         Expanded(
           child: Container(
             decoration: const BoxDecoration(
-              color: whiteCardTextBackground,
+              color: cardContentBackgroundColor,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(8.0),
                 bottomRight: Radius.circular(8.0),
@@ -110,7 +110,7 @@ class CardRowState extends State<CardRow> {
             ),
             child: Text(
               text2,
-              style: const TextStyle(color: cardTextFont, fontSize: 18),
+              style: const TextStyle(color: cardContentFontColor, fontSize: 18),
             ),
           ),
         ),
