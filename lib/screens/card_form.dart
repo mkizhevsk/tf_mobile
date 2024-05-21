@@ -113,7 +113,6 @@ class _CardFormState extends State<CardForm> {
 
                 StreamManager().cardIdSink.add(cardId);
 
-                // Navigate to another screen
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(builder: (context) => const MyHome()),
                 );

@@ -3,7 +3,6 @@ import 'package:path/path.dart';
 import 'package:tf_mobile/model/task.dart';
 import 'package:tf_mobile/model/card.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
-// import 'package:tf_mobile/utils/string_random_generator.dart';
 
 const String fileName = "tasks_database.db";
 

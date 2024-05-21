@@ -3,10 +3,11 @@ import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/model/card.dart';
 import 'package:tf_mobile/screens/card_form.dart';
 import 'package:tf_mobile/stream_manager.dart';
-// import 'package:tf_mobile/screens/card_row.dart';
+import 'package:tf_mobile/main.dart';
 import 'package:tf_mobile/screens/card_row.dart';
 import 'package:tf_mobile/design/colors.dart';
 import 'dart:async';
+import 'package:tf_mobile/assets/constants.dart' as constants;
 
 class CardTab extends StatefulWidget {
   const CardTab({super.key});
@@ -145,14 +146,14 @@ class CardBody extends StatelessWidget {
                 ),
               ),
             ),
-            const Padding(
-              padding: EdgeInsets.only(
+            Padding(
+              padding: const EdgeInsets.only(
                 left: 10.0,
                 top: 0.0,
                 right: 10.0,
                 bottom: 0.0,
               ),
-              child: ButtomsRow(),
+              child: ButtomsRow(cardId: cardId),
             ),
           ],
         ),
@@ -171,25 +172,49 @@ class SearchRow extends StatelessWidget {
 }
 
 class ButtomsRow extends StatelessWidget {
-  const ButtomsRow({super.key});
+  final int cardId;
+
+  const ButtomsRow({
+    super.key,
+    required this.cardId,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final AppDatabase db = AppDatabase.instance;
+
     return SizedBox(
       width: double.infinity,
       child: Row(
         children: [
           Expanded(
             child: TextButton(
-                onPressed: () {
-                  print('111');
+                onPressed: () async {
+                  var updatedCard = await db.getCard(cardId);
+                  updatedCard.editDateTime = DateTime.now();
+                  db.updateCardOld(updatedCard);
+
+                  StreamManager().cardIdSink.add(0);
+
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const MyHome()),
+                  );
                 },
                 child: const Icon(Icons.navigate_next)),
           ),
           Expanded(
             child: TextButton(
-                onPressed: () {
-                  print('222');
+                onPressed: () async {
+                  var updatedCard = await db.getCard(cardId);
+                  updatedCard.editDateTime = DateTime.now();
+                  updatedCard.status = constants.cardIsLearned;
+                  db.updateCardOld(updatedCard);
+
+                  StreamManager().cardIdSink.add(0);
+
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const MyHome()),
+                  );
                 },
                 child: const Icon(Icons.done)),
           ),
