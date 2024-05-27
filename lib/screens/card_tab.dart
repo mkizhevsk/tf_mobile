@@ -10,7 +10,8 @@ import 'package:tf_mobile/design/colors.dart';
 import 'dart:async';
 import 'package:tf_mobile/assets/constants.dart' as constants;
 import 'package:tf_mobile/services/http_service.dart';
-import 'package:tf_mobile/model/dto/CardDTO.dart';
+// import 'package:tf_mobile/model/dto/CardDTO.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CardTab extends StatefulWidget {
   const CardTab({super.key});
@@ -64,7 +65,28 @@ class CardTabState extends State<CardTab> {
             // Handle menu item selection here
             if (value == 1) {
               print('one');
-              httpService.getCards().then((value) => print(value));
+              httpService.getCards().then((cards) {
+                for (var card in cards) {
+                  print(
+                      'Card: ${card.internalCode}, ${card.front}, ${card.back}, ${card.example}, ${card.status}, ${card.editDateTime}');
+                }
+
+                var card1 = cards[1];
+                String cardData =
+                    'Card: ${card1.internalCode}, ${card1.front}, ${card1.back}, ${card1.example}, ${card1.status}, ${card1.editDateTime}';
+                //print(cardData);
+                Fluttertoast.showToast(
+                  msg: cardData,
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              }).catchError((error) {
+                print('Error: $error');
+              });
             } else if (value == 2) {
               // Exit the app
               SystemNavigator.pop();

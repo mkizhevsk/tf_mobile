@@ -10,11 +10,18 @@ class HttpService {
   HttpService();
 
   Future<List<CardEntity>> getCards() async {
-    final response = await http.get(Uri.parse('$cardsUrl/cards'));
-    print(response.body);
+    final response = await http.get(
+      Uri.parse('$cardsUrl/cards'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    String responseBody = utf8.decode(response.bodyBytes);
+    print(responseBody);
 
     if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
+      List<dynamic> body = jsonDecode(responseBody);
       List<CardDTO> cardDTOList =
           body.map((dynamic item) => CardDTO.fromJson(item)).toList();
 
