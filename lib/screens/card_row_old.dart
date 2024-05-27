@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tf_mobile/database/app_database.dart';
-import 'package:tf_mobile/model/card.dart';
+import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/screens/card_form.dart';
 
 class CardRowOld extends StatefulWidget {

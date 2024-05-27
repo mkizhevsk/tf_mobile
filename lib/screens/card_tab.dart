@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tf_mobile/database/app_database.dart';
-import 'package:tf_mobile/model/card.dart';
+import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/screens/card_form.dart';
 import 'package:tf_mobile/stream_manager.dart';
 import 'package:tf_mobile/main.dart';
@@ -9,6 +9,8 @@ import 'package:tf_mobile/screens/card_row.dart';
 import 'package:tf_mobile/design/colors.dart';
 import 'dart:async';
 import 'package:tf_mobile/assets/constants.dart' as constants;
+import 'package:tf_mobile/services/http_service.dart';
+import 'package:tf_mobile/model/dto/CardDTO.dart';
 
 class CardTab extends StatefulWidget {
   const CardTab({super.key});
@@ -24,11 +26,14 @@ class CardTabState extends State<CardTab> {
 
   StreamSubscription<int>? _cardIdSubscription;
 
+  final HttpService httpService = HttpService();
+
   @override
   void initState() {
     print('initState of CardTabState');
     super.initState();
     db = AppDatabase.instance;
+    final HttpService httpService = HttpService();
 
     _cardIdSubscription = StreamManager().cardIdStream.listen((cardId) {
       print('CardTabState Received cardId: $cardId');
@@ -58,16 +63,17 @@ class CardTabState extends State<CardTab> {
           onSelected: (value) {
             // Handle menu item selection here
             if (value == 1) {
-              print('Item 1 selected');
+              print('one');
+              httpService.getCards().then((value) => print(value));
             } else if (value == 2) {
               // Exit the app
               SystemNavigator.pop();
             }
           },
-          itemBuilder: (context) => [
+          itemBuilder: (context) => const [
             PopupMenuItem(
               value: 1,
-              child: Text('Item 1'),
+              child: Text('Cards'),
             ),
             PopupMenuItem(
               value: 2,

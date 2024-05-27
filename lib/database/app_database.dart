@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:tf_mobile/model/task.dart';
-import 'package:tf_mobile/model/card.dart';
+import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
 
 const String fileName = "tasks_database.db";

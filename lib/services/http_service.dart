@@ -1,13 +1,46 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tf_mobile/model/dto/CardDTO.dart';
+import 'package:tf_mobile/model/entity/card.dart';
+import 'package:tf_mobile/utils/date_util.dart';
 
 class HttpService {
-  final String baseUrl;
+  final String cardsUrl = 'http://allwelding.ru/api';
 
-  HttpService({required this.baseUrl});
+  HttpService();
+
+  Future<List<CardEntity>> getCards() async {
+    final response = await http.get(Uri.parse('$cardsUrl/cards'));
+    print(response.body);
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      List<CardDTO> cardDTOList =
+          body.map((dynamic item) => CardDTO.fromJson(item)).toList();
+
+      List<CardEntity> cards = [];
+
+      for (var cardDTO in cardDTOList) {
+        CardEntity card = CardEntity(
+          internalCode: cardDTO.internalCode,
+          editDateTime: DateUtil.parseDateTime(cardDTO.editDateTime),
+          front: cardDTO.front,
+          back: cardDTO.back,
+          example: cardDTO.example,
+          status: cardDTO.status,
+        );
+
+        cards.add(card);
+      }
+
+      return cards;
+    } else {
+      throw Exception('Failed to load cards');
+    }
+  }
 
   Future<http.Response> get(String endpoint) async {
-    final response = await http.get(Uri.parse('$baseUrl$endpoint'));
+    final response = await http.get(Uri.parse('$cardsUrl$endpoint'));
 
     if (response.statusCode == 200) {
       return response;
@@ -18,7 +51,7 @@ class HttpService {
 
   Future<http.Response> post(String endpoint, Map<String, dynamic> data) async {
     final response = await http.post(
-      Uri.parse('$baseUrl$endpoint'),
+      Uri.parse('$cardsUrl$endpoint'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(data),
     );
@@ -32,7 +65,7 @@ class HttpService {
 
   Future<http.Response> put(String endpoint, Map<String, dynamic> data) async {
     final response = await http.put(
-      Uri.parse('$baseUrl$endpoint'),
+      Uri.parse('$cardsUrl$endpoint'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(data),
     );
@@ -45,7 +78,7 @@ class HttpService {
   }
 
   Future<http.Response> delete(String endpoint) async {
-    final response = await http.delete(Uri.parse('$baseUrl$endpoint'));
+    final response = await http.delete(Uri.parse('$cardsUrl$endpoint'));
 
     if (response.statusCode == 200) {
       return response;

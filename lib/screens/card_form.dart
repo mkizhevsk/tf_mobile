@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:tf_mobile/screens/cards.dart';
 import 'package:tf_mobile/database/app_database.dart';
-import 'package:tf_mobile/model/card.dart';
+import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/stream_manager.dart';
 import 'package:tf_mobile/utils/string_random_generator.dart';
 import 'package:tf_mobile/main.dart';
