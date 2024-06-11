@@ -5,7 +5,7 @@ import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/utils/date_util.dart';
 
 class HttpService {
-  final String cardsUrl = 'http://allwelding.ru/api';
+  final String cardsUrl = 'https://mkizhevsk.ru/api';
 
   HttpService();
 
