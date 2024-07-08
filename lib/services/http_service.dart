@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:tf_mobile/model/dto/CardDTO.dart';
+import 'package:tf_mobile/model/dto/card_dto.dart';
 import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/utils/date_util.dart';
 
@@ -8,6 +8,51 @@ class HttpService {
   final String cardsUrl = 'https://mkizhevsk.ru/api';
 
   HttpService();
+
+  Future<List<CardEntity>> syncCards(cards) async {
+    //var mobileCards = cards.map((card) => CardDTO.toJson(card)).toList();
+    var mobileCards =
+        cards.map((card) => CardDTO.fromEntity(card).toJson()).toList();
+    for (var card in mobileCards) {
+      print(card);
+    }
+
+    final response = await http.post(
+      Uri.parse('$cardsUrl/cards/sync'),
+      headers: {
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(mobileCards),
+    );
+
+    String responseBody = utf8.decode(response.bodyBytes);
+    print(responseBody);
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(responseBody);
+      List<CardDTO> cardDTOList =
+          body.map((dynamic item) => CardDTO.fromJson(item)).toList();
+
+      List<CardEntity> cards = [];
+
+      for (var cardDTO in cardDTOList) {
+        CardEntity card = CardEntity(
+          internalCode: cardDTO.internalCode,
+          editDateTime: DateUtil.stringToDateTime(cardDTO.editDateTime),
+          front: cardDTO.front,
+          back: cardDTO.back,
+          example: cardDTO.example,
+          status: cardDTO.status,
+        );
+
+        cards.add(card);
+      }
+
+      return cards;
+    } else {
+      throw Exception('Failed to load cards');
+    }
+  }
 
   Future<List<CardEntity>> getCards() async {
     final response = await http.get(
@@ -30,7 +75,7 @@ class HttpService {
       for (var cardDTO in cardDTOList) {
         CardEntity card = CardEntity(
           internalCode: cardDTO.internalCode,
-          editDateTime: DateUtil.parseDateTime(cardDTO.editDateTime),
+          editDateTime: DateUtil.stringToDateTime(cardDTO.editDateTime),
           front: cardDTO.front,
           back: cardDTO.back,
           example: cardDTO.example,

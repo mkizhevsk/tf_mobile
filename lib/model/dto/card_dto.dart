@@ -1,3 +1,6 @@
+import 'package:tf_mobile/model/entity/card.dart';
+import 'package:tf_mobile/utils/date_util.dart';
+
 class CardDTO {
   final String internalCode;
   final String editDateTime;
@@ -35,5 +38,16 @@ class CardDTO {
       'example': example,
       'status': status,
     };
+  }
+
+  static CardDTO fromEntity(CardEntity entity) {
+    return CardDTO(
+      internalCode: entity.internalCode,
+      front: entity.front ?? '',
+      back: entity.back ?? '',
+      example: entity.example ?? '',
+      status: entity.status ?? 0,
+      editDateTime: DateUtil.dateTimeToString(entity.editDateTime),
+    );
   }
 }

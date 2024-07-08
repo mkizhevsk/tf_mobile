@@ -4,6 +4,7 @@ import 'screens/card_tab.dart';
 import 'screens/contacts.dart';
 import 'package:tf_mobile/stream_manager.dart';
 import 'dart:async';
+import 'package:tf_mobile/services/app_initializer.dart';
 
 void main() {
   runApp(
@@ -41,6 +42,11 @@ class MyHomeState extends State<MyHome> {
         cardTabCardId = cardId;
         print('MyHomeState Received cardId: $cardId');
       });
+    });
+
+    // Schedule the method to run after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppInitializer.runAfterStart();
     });
   }
 

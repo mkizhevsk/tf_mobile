@@ -1,6 +1,5 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:tf_mobile/model/task.dart';
 import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
 
@@ -20,15 +19,15 @@ class AppDatabase {
   }
 
   Future _createDB(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE $taskTableName (
-        $taskIdField ${constants.idType},
-        $taskTitleField ${constants.textType},
-        $taskDescriptionField ${constants.textTypeNullable},
-        $taskDueDateField ${constants.textType},
-        $taskIsDoneField ${constants.boolType}
-      )
-    ''');
+    // await db.execute('''
+    //   CREATE TABLE $taskTableName (
+    //     $taskIdField ${constants.idType},
+    //     $taskTitleField ${constants.textType},
+    //     $taskDescriptionField ${constants.textTypeNullable},
+    //     $taskDueDateField ${constants.textType},
+    //     $taskIsDoneField ${constants.boolType}
+    //   )
+    // ''');
     await db.execute('''
       CREATE TABLE $cardTableName (
         $cardIdField ${constants.idType},
@@ -60,6 +59,17 @@ class AppDatabase {
     final result =
         await db.query(cardTableName, where: 'id = ?', whereArgs: [cardId]);
     return result.map((json) => CardEntity.fromJson(json)).first;
+  }
+
+  Future<CardEntity> updateCard(CardEntity card) async {
+    final db = await instance.database;
+    await db.update(
+      cardTableName,
+      card.toJson(),
+      where: 'id = ?',
+      whereArgs: [card.id],
+    );
+    return card;
   }
 
   Future<List<CardEntity>> getCards() async {
@@ -107,41 +117,5 @@ class AppDatabase {
       where: "$cardIdField = ?",
       whereArgs: [card.id],
     );
-  }
-
-  // Task
-  Future<Task> createTask(Task task) async {
-    final db = await instance.database;
-    final id = await db.insert(taskTableName, task.toJson());
-    return task.copyWith(id: id);
-  }
-
-  Future<Task> getTask(int taskId) async {
-    final db = await instance.database;
-    final result =
-        await db.query(taskTableName, where: 'id = ?', whereArgs: [taskId]);
-    return result.map((json) => Task.fromJson(json)).first;
-  }
-
-  Future<List<Task>> getTasks() async {
-    final db = await instance.database;
-    final result =
-        await db.query(taskTableName, orderBy: "$taskDueDateField DESC");
-    return result.map((json) => Task.fromJson(json)).toList();
-  }
-
-  Future<int> updateTask(Task task) async {
-    final db = await instance.database;
-    return await db.update(
-      taskTableName,
-      task.toJson(),
-      where: "$taskIdField = ?",
-      whereArgs: [task.id],
-    );
-  }
-
-  close() async {
-    final db = await instance.database;
-    return db.close;
   }
 }
