@@ -8,6 +8,7 @@ class CardDTO {
   final String back;
   final String example;
   final int status;
+  final bool deleted;
 
   CardDTO({
     required this.internalCode,
@@ -16,6 +17,7 @@ class CardDTO {
     required this.back,
     required this.example,
     required this.status,
+    required this.deleted,
   });
 
   factory CardDTO.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class CardDTO {
       back: json['back'],
       example: json['example'],
       status: json['status'],
+      deleted: json['deleted'] as bool,
     );
   }
 
@@ -37,6 +40,7 @@ class CardDTO {
       'back': back,
       'example': example,
       'status': status,
+      'deleted': deleted,
     };
   }
 
@@ -48,6 +52,7 @@ class CardDTO {
       example: entity.example ?? '',
       status: entity.status ?? 0,
       editDateTime: DateUtil.dateTimeToString(entity.editDateTime),
+      deleted: false,
     );
   }
 }

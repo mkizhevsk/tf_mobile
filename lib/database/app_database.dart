@@ -72,6 +72,15 @@ class AppDatabase {
     return card;
   }
 
+  Future<int> deleteCardByInternalCode(String internalCode) async {
+    final db = await instance.database;
+    return await db.delete(
+      cardTableName,
+      where: '$cardInternalCodeField = ?',
+      whereArgs: [internalCode],
+    );
+  }
+
   Future<List<CardEntity>> getCards() async {
     final db = await instance.database;
     final result =
