@@ -4,27 +4,34 @@ import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/model/dto/card_dto.dart';
 import 'package:tf_mobile/utils/date_util.dart';
+import 'dart:async';
+import 'package:logging/logging.dart';
 
 class AppInitializer {
-  static void runAfterStart() {
-    print('This runs after the app has started.');
+  static final Logger _logger = Logger('AppInitializer');
+  static final Completer<void> _initializerCompleter = Completer<void>();
 
-    _fetchAndSyncCards();
+  static Future<void> runAfterStart() async {
+    if (!_initializerCompleter.isCompleted) {
+      _logger.info('This runs after the app has started.');
+      await _fetchAndSyncCards();
+      _initializerCompleter.complete();
+    }
+    await _initializerCompleter.future;
   }
 
-  static void _fetchAndSyncCards() async {
+  static Future<void> _fetchAndSyncCards() async {
     try {
       List<CardEntity> localCards = await AppDatabase.instance.getCards();
-      print('Fetched ${localCards.length} cards from local database.');
-
-      for (var card in localCards) {
-        print(card);
-      }
+      _logger.info('Fetched ${localCards.length} cards from local database');
+      // for (var card in localCards) {
+      //   _logger.fine(card);
+      // }
 
       // Sync fetched cards with server
       await _syncCardsWithServer(localCards);
     } catch (error) {
-      print('Error fetching or syncing cards: $error');
+      _logger.severe('Error fetching or syncing cards: $error');
     }
   }
 
@@ -33,54 +40,19 @@ class AppInitializer {
 
     try {
       List<CardDTO> webCardDtoList = await httpService.syncCards(localCards);
-      print('webCards: $webCardDtoList');
-      for (var wc in webCardDtoList) {
-        print(wc);
-      }
+      _logger.info('received webCardDtos: ${webCardDtoList.length}');
+      // for (var wc in webCardDtoList) {
+      //   _logger.fine(wc);
+      // }
 
       for (var webCardDto in webCardDtoList) {
-        print(
+        _logger.fine(
             'Web Card: ${webCardDto.internalCode}, ${webCardDto.front}, ${webCardDto.back}, ${webCardDto.example}, ${webCardDto.status}, ${webCardDto.editDateTime}');
 
         await _processCard(localCards, webCardDto);
-
-        // bool isPresent = false;
-        // CardEntity webCard = _createCardEntity(webCardDto);
-        // CardEntity(
-        //   internalCode: webCardDto.internalCode,
-        //   editDateTime: DateUtil.stringToDateTime(webCardDto.editDateTime),
-        //   front: webCardDto.front,
-        //   back: webCardDto.back,
-        //   example: webCardDto.example,
-        //   status: webCardDto.status,
-        // );
-
-        // for (var localCard in localCards) {
-        //   if (localCard.internalCode == webCard.internalCode) {
-        //     isPresent = true;
-        //     if (webCardDto.deleted) {
-        //       var result = await AppDatabase.instance
-        //           .deleteCardByInternalCode(localCard.internalCode);
-        //       if (result > 0) {
-        //         print(
-        //             "card with internalCode ${webCard.internalCode} was deleted");
-        //       }
-        //     } else if (webCard.editDateTime.isAfter(localCard.editDateTime)) {
-        //       await AppDatabase.instance.updateCard(webCard);
-        //       print(
-        //           'Updated local card with internalCode: ${webCard.internalCode}');
-        //     }
-        //     break;
-        //   }
-        // }
-
-        // if (!isPresent) {
-        //   await AppDatabase.instance.createCard(webCard);
-        //   print('Created new card with internalCode: ${webCard.internalCode}');
-        // }
       }
     } catch (error) {
-      print('Error syncing cards with server: $error');
+      _logger.severe('Error syncing cards with server: $error');
       // Handle error
     }
   }
@@ -122,18 +94,20 @@ class AppInitializer {
     var result =
         await AppDatabase.instance.deleteCardByInternalCode(internalCode);
     if (result > 0) {
-      print("Card with internalCode $internalCode was deleted");
+      _logger.info("Card with internalCode $internalCode was deleted");
     }
   }
 
   static Future<void> _updateCard(CardEntity webCard) async {
     await AppDatabase.instance.updateCard(webCard);
-    print('Updated local card with internalCode: ${webCard.internalCode}');
+    _logger
+        .info('Updated local card with internalCode: ${webCard.internalCode}');
   }
 
   static Future<void> _createCard(CardEntity webCard) async {
     await AppDatabase.instance.createCard(webCard);
-    print('Created new local card with internalCode: ${webCard.internalCode}');
+    _logger.info(
+        'Created new local card with internalCode: ${webCard.internalCode}');
   }
 }
 

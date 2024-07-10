@@ -91,10 +91,10 @@ class AppDatabase {
   Future<CardEntity> getCardToLearn() async {
     print('getCardToLearn');
     var cards = await getCards();
-    print(cards.length);
-    for (var card in cards) {
-      print(card);
-    }
+    print('cards to learn: ${cards.length}');
+    // for (var card in cards) {
+    //   print(card);
+    // }
     var currentDate = DateTime.now();
     var formattedCurrentDate =
         DateTime(currentDate.year, currentDate.month, currentDate.day);
@@ -103,7 +103,7 @@ class AppDatabase {
         .where((card) => card.status == constants.cardIsNotLearned)
         .where((card) => !isSameDay(card.editDateTime, formattedCurrentDate))
         .toList();
-    print(unlearnedCards.length);
+    print('unlearned cards: ${unlearnedCards.length}');
     unlearnedCards.sort((a, b) => a.editDateTime.compareTo(b.editDateTime));
     if (unlearnedCards.isNotEmpty) {
       return unlearnedCards.first;
@@ -118,7 +118,7 @@ class AppDatabase {
         date1.day == date2.day;
   }
 
-  Future<int> updateCardOld(CardEntity card) async {
+  Future<int> updateCardFromForm(CardEntity card) async {
     final db = await instance.database;
     return await db.update(
       cardTableName,

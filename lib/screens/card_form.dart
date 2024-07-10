@@ -108,14 +108,17 @@ class _CardFormState extends State<CardForm> {
                   updatedCard.front = _front.text;
                   updatedCard.back = _back.text;
                   updatedCard.example = _example.text;
-                  cardId = await db.updateCardOld(updatedCard);
+                  cardId = await db.updateCardFromForm(updatedCard);
+                  print(updatedCard);
                 }
 
-                StreamManager().cardIdSink.add(cardId);
+                if (mounted) {
+                  StreamManager().cardIdSink.add(cardId);
 
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const MyHome()),
-                );
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const MyHome()),
+                  );
+                }
               },
               child: const Text('Submit'),
             ),

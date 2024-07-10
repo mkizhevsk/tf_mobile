@@ -5,11 +5,20 @@ import 'screens/contacts.dart';
 import 'package:tf_mobile/stream_manager.dart';
 import 'dart:async';
 import 'package:tf_mobile/services/app_initializer.dart';
+import 'package:logging/logging.dart';
 
 void main() {
+  _setupLogging();
   runApp(
     const MaterialApp(home: MyHome()),
   );
+}
+
+void _setupLogging() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((LogRecord rec) {
+    print('${rec.level.name}: ${rec.time}: ${rec.loggerName}: ${rec.message}');
+  });
 }
 
 class MyHome extends StatefulWidget {

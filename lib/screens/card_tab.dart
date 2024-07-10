@@ -233,7 +233,7 @@ class ButtomsRow extends StatelessWidget {
                 onPressed: () async {
                   var updatedCard = await db.getCard(cardId);
                   updatedCard.editDateTime = DateTime.now();
-                  db.updateCardOld(updatedCard);
+                  db.updateCardFromForm(updatedCard);
 
                   StreamManager().cardIdSink.add(0);
 
@@ -249,7 +249,7 @@ class ButtomsRow extends StatelessWidget {
                   var updatedCard = await db.getCard(cardId);
                   updatedCard.editDateTime = DateTime.now();
                   updatedCard.status = constants.cardIsLearned;
-                  db.updateCardOld(updatedCard);
+                  db.updateCardFromForm(updatedCard);
 
                   StreamManager().cardIdSink.add(0);
 
