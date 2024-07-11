@@ -44,6 +44,29 @@ class _CardFormState extends State<CardForm> {
     _example.text = widget.example;
   }
 
+  Future<int> _createCard() async {
+    var card = CardEntity(
+      internalCode: StringRandomGenerator.instance.getValue(),
+      editDateTime: DateTime.now(),
+      front: _front.text,
+      back: _back.text,
+      example: _example.text,
+      status: 0,
+    );
+    var newCard = await db.createCard(card);
+    return newCard.id!;
+  }
+
+  Future<int> _updateCard() async {
+    var updatedCard = await db.getCard(widget.cardId);
+    updatedCard.editDateTime = DateTime.now();
+    updatedCard.front = _front.text;
+    updatedCard.back = _back.text;
+    updatedCard.example = _example.text;
+    await db.updateCardFromForm(updatedCard);
+    return updatedCard.id!;
+  }
+
   @override
   Widget build(BuildContext context) {
     // print('cardId ${widget.cardId}');
@@ -92,26 +115,10 @@ class _CardFormState extends State<CardForm> {
                 // print('widget.cardId ' + widget.cardId.toString());
                 int cardId;
                 if (widget.cardId == 0) {
-                  var card = CardEntity(
-                    internalCode: StringRandomGenerator.instance.getValue(),
-                    editDateTime: DateTime.now(),
-                    front: _front.text,
-                    back: _back.text,
-                    example: _example.text,
-                    status: 0,
-                  );
-                  var newCard = await db.createCard(card);
-                  cardId = newCard.id!;
+                  cardId = await _createCard();
                 } else {
-                  var updatedCard = await db.getCard(widget.cardId);
-                  updatedCard.editDateTime = DateTime.now();
-                  updatedCard.front = _front.text;
-                  updatedCard.back = _back.text;
-                  updatedCard.example = _example.text;
-                  cardId = await db.updateCardFromForm(updatedCard);
-                  print(updatedCard);
+                  cardId = await _updateCard();
                 }
-
                 if (mounted) {
                   StreamManager().cardIdSink.add(cardId);
 
