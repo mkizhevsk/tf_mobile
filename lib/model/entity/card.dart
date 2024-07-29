@@ -1,22 +1,20 @@
-const String cardTableName = "card";
+const String cardIdJsonName = "id";
+const String cardInternalCodeJsonName = "internal_code";
+const String cardEditDateTimeJsonName = "edit_date_time";
+const String cardFrontJsonName = "front";
+const String cardBackJsonName = "back";
+const String cardExampleJsonName = "example";
+const String cardStatusJsonName = "status";
 
-const String cardIdField = "id";
-const String cardInternalCodeField = "internal_code";
-const String cardEditDateTimeField = "edit_date_time";
-const String cardFrontField = "front";
-const String cardBackField = "back";
-const String cardExampleField = "example";
-const String cardStatusField = "status";
-
-const List<String> cardColumns = [
-  cardIdField,
-  cardInternalCodeField,
-  cardEditDateTimeField,
-  cardFrontField,
-  cardBackField,
-  cardExampleField,
-  cardStatusField,
-];
+// const List<String> cardColumns = [
+//   cardIdField,
+//   cardInternalCodeField,
+//   cardEditDateTimeField,
+//   cardFrontField,
+//   cardBackField,
+//   cardExampleField,
+//   cardStatusField,
+// ];
 
 class CardEntity {
   int? id;
@@ -40,23 +38,23 @@ class CardEntity {
   CardEntity.empty();
 
   static CardEntity fromJson(Map<String, dynamic> json) => CardEntity(
-        id: json[cardIdField] as int,
-        internalCode: json[cardInternalCodeField] as String,
-        editDateTime: DateTime.parse(json[cardEditDateTimeField] as String),
-        front: json[cardFrontField] as String?,
-        back: json[cardBackField] as String?,
-        example: json[cardExampleField] as String?,
-        status: json[cardStatusField] as int?,
+        id: json[cardIdJsonName] as int,
+        internalCode: json[cardInternalCodeJsonName] as String,
+        editDateTime: DateTime.parse(json[cardEditDateTimeJsonName] as String),
+        front: json[cardFrontJsonName] as String?,
+        back: json[cardBackJsonName] as String?,
+        example: json[cardExampleJsonName] as String?,
+        status: json[cardStatusJsonName] as int?,
       );
 
   Map<String, dynamic> toJson() => {
-        cardIdField: id,
-        cardInternalCodeField: internalCode,
-        cardEditDateTimeField: editDateTime.toIso8601String(),
-        cardFrontField: front,
-        cardBackField: back,
-        cardExampleField: example,
-        cardStatusField: status,
+        cardIdJsonName: id,
+        cardInternalCodeJsonName: internalCode,
+        cardEditDateTimeJsonName: editDateTime.toIso8601String(),
+        cardFrontJsonName: front,
+        cardBackJsonName: back,
+        cardExampleJsonName: example,
+        cardStatusJsonName: status,
       };
 
   CardEntity copyWith({

@@ -19,24 +19,25 @@ class AppDatabase {
   }
 
   Future _createDB(Database db, int version) async {
-    // await db.execute('''
-    //   CREATE TABLE $taskTableName (
-    //     $taskIdField ${constants.idType},
-    //     $taskTitleField ${constants.textType},
-    //     $taskDescriptionField ${constants.textTypeNullable},
-    //     $taskDueDateField ${constants.textType},
-    //     $taskIsDoneField ${constants.boolType}
-    //   )
-    // ''');
     await db.execute('''
-      CREATE TABLE $cardTableName (
-        $cardIdField ${constants.idType},
-        $cardInternalCodeField ${constants.textType},
-        $cardEditDateTimeField ${constants.textType},
-        $cardFrontField ${constants.textTypeNullable},
-        $cardBackField ${constants.textTypeNullable},
-        $cardExampleField ${constants.textTypeNullable},
-        $cardStatusField ${constants.intTypeNullable}
+      CREATE TABLE ${constants.cardTableName} (
+        ${constants.cardIdField} ${constants.idType},
+        ${constants.cardInternalCodeField} ${constants.textType},
+        ${constants.cardEditDateTimeField} ${constants.textType},
+        ${constants.cardFrontField} ${constants.textTypeNullable},
+        ${constants.cardBackField} ${constants.textTypeNullable},
+        ${constants.cardExampleField} ${constants.textTypeNullable},
+        ${constants.cardStatusField} ${constants.intTypeNullable}
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE ${constants.tokenTableName} (
+        ${constants.tokenIdField} ${constants.idType},
+        ${constants.accessTokenField} ${constants.textType},
+        ${constants.refreshTokenField} ${constants.textType},
+        ${constants.tokenTypeField} ${constants.textType},
+        ${constants.expiryDateField} ${constants.textType}
       )
     ''');
   }
@@ -50,21 +51,21 @@ class AppDatabase {
   // Card
   Future<CardEntity> createCard(CardEntity card) async {
     final db = await instance.database;
-    final id = await db.insert(cardTableName, card.toJson());
+    final id = await db.insert(constants.cardTableName, card.toJson());
     return card.copyWith(id: id);
   }
 
   Future<CardEntity> getCard(int cardId) async {
     final db = await instance.database;
-    final result =
-        await db.query(cardTableName, where: 'id = ?', whereArgs: [cardId]);
+    final result = await db
+        .query(constants.cardTableName, where: 'id = ?', whereArgs: [cardId]);
     return result.map((json) => CardEntity.fromJson(json)).first;
   }
 
   Future<CardEntity> updateCard(CardEntity card) async {
     final db = await instance.database;
     await db.update(
-      cardTableName,
+      constants.cardTableName,
       card.toJson(),
       where: 'id = ?',
       whereArgs: [card.id],
@@ -75,16 +76,16 @@ class AppDatabase {
   Future<int> deleteCardByInternalCode(String internalCode) async {
     final db = await instance.database;
     return await db.delete(
-      cardTableName,
-      where: '$cardInternalCodeField = ?',
+      constants.cardTableName,
+      where: '${constants.cardInternalCodeField} = ?',
       whereArgs: [internalCode],
     );
   }
 
   Future<List<CardEntity>> getCards() async {
     final db = await instance.database;
-    final result =
-        await db.query(cardTableName, orderBy: "$cardEditDateTimeField DESC");
+    final result = await db.query(constants.cardTableName,
+        orderBy: "${constants.cardEditDateTimeField} DESC");
     return result.map((json) => CardEntity.fromJson(json)).toList();
   }
 
@@ -121,10 +122,45 @@ class AppDatabase {
   Future<int> updateCardFromForm(CardEntity card) async {
     final db = await instance.database;
     return await db.update(
-      cardTableName,
+      constants.cardTableName,
       card.toJson(),
-      where: "$cardIdField = ?",
+      where: "${constants.cardIdField} = ?",
       whereArgs: [card.id],
     );
+  }
+
+  // Token
+  Future<void> saveToken(String accessToken, String refreshToken,
+      String tokenType, String expiryDate) async {
+    final db = await instance.database;
+    await db.insert(constants.tokenTableName, {
+      constants.accessTokenField: accessToken,
+      constants.refreshTokenField: refreshToken,
+      constants.tokenTypeField: tokenType,
+      constants.expiryDateField: expiryDate,
+    });
+  }
+
+  Future<Map<String, String>?> getToken() async {
+    final db = await instance.database;
+    final result = await db.query(constants.tokenTableName);
+    if (result.isNotEmpty) {
+      return {
+        constants.accessTokenField:
+            result.first[constants.accessTokenField] as String,
+        constants.refreshTokenField:
+            result.first[constants.refreshTokenField] as String,
+        constants.tokenTypeField:
+            result.first[constants.tokenTypeField] as String,
+        constants.expiryDateField:
+            result.first[constants.expiryDateField] as String,
+      };
+    }
+    return null;
+  }
+
+  Future<void> deleteToken() async {
+    final db = await instance.database;
+    await db.delete(constants.tokenTableName);
   }
 }
