@@ -39,6 +39,8 @@ class AppInitializer {
     final HttpService httpService = HttpService();
 
     try {
+      await httpService.authenticate();
+
       List<CardDTO> webCardDtoList = await httpService.syncCards(localCards);
       _logger.info('received webCardDtos: ${webCardDtoList.length}');
       // for (var wc in webCardDtoList) {

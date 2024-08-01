@@ -4,6 +4,8 @@ import 'package:tf_mobile/model/dto/card_dto.dart';
 import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/utils/date_util.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
+import 'package:tf_mobile/database/app_database.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 class HttpService {
   final String cardsUrl = 'https://mkizhevsk.ru/api';
@@ -14,6 +16,8 @@ class HttpService {
   HttpService();
 
   Future<void> authenticate() async {
+    print("start authenticate()");
+
     final response = await http.post(
       Uri.parse(tokenUrl),
       headers: {
@@ -24,22 +28,30 @@ class HttpService {
     );
 
     if (response.statusCode == 200) {
-      final tokenData = jsonDecode(response.body);
-      final accessToken = tokenData['access_token'];
-      final refreshToken = tokenData['refresh_token'];
-      final tokenType = tokenData['token_type'];
-      final expiryDate = tokenData['expiry_date'];
+      print("here");
+      final token = response.body
+          .trim(); // Assuming the token is returned as a plain string
+      print(token);
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      print(decodedToken);
+      String expiryDate =
+          DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000)
+              .toIso8601String();
 
-      final token = {
-        constants.accessTokenField: accessToken,
-        constants.refreshTokenField: refreshToken,
-        constants.tokenTypeField: tokenType,
-        constants.expiryDateField: expiryDate,
+      print(expiryDate + token);
+
+      final tokenData = {
+        constants.accessTokenField: token,
+        constants.refreshTokenField:
+            '', // If your backend does not provide a refresh token, you can leave it empty
+        constants.tokenTypeField: 'Bearer', // Assuming the token type is Bearer
+        constants.expiryDateField:
+            expiryDate.toString(), // Convert expiry date to String
       };
 
       // Save the token to the database
       final db = AppDatabase.instance;
-      await db.saveToken(token);
+      await db.saveToken(tokenData);
     } else {
       throw Exception('Failed to authenticate');
     }
@@ -53,10 +65,15 @@ class HttpService {
       print(card);
     }
 
+    final db = AppDatabase.instance;
+    final tokenData = await db.getToken();
+
     final response = await http.post(
       Uri.parse('$cardsUrl/cards/sync'),
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
+        if (tokenData != null)
+          'Authorization': 'Bearer ${tokenData[constants.accessTokenField]}',
       },
       body: jsonEncode(mobileCards),
     );

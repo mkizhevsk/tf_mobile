@@ -130,15 +130,24 @@ class AppDatabase {
   }
 
   // Token
-  Future<void> saveToken(String accessToken, String refreshToken,
-      String tokenType, String expiryDate) async {
+  // Future<void> saveToken(String accessToken, String refreshToken,
+  //     String tokenType, String expiryDate) async {
+  //   final db = await instance.database;
+  //   await db.insert(constants.tokenTableName, {
+  //     constants.accessTokenField: accessToken,
+  //     constants.refreshTokenField: refreshToken,
+  //     constants.tokenTypeField: tokenType,
+  //     constants.expiryDateField: expiryDate,
+  //   });
+  // }
+  Future<void> saveToken(Map<String, dynamic> token) async {
     final db = await instance.database;
-    await db.insert(constants.tokenTableName, {
-      constants.accessTokenField: accessToken,
-      constants.refreshTokenField: refreshToken,
-      constants.tokenTypeField: tokenType,
-      constants.expiryDateField: expiryDate,
-    });
+
+    // Clear previous tokens
+    await db.delete(constants.tokenTableName);
+
+    // Insert new token
+    await db.insert(constants.tokenTableName, token);
   }
 
   Future<Map<String, String>?> getToken() async {
