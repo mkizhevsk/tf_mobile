@@ -10,52 +10,8 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 class HttpService {
   final String cardsUrl = 'https://mkizhevsk.ru/api';
   final String tokenUrl = 'https://mkizhevsk.ru/api/token';
-  final String username = 'dvega2';
-  final String password = 'password';
 
   HttpService();
-
-  Future<void> authenticate() async {
-    print("start authenticate()");
-
-    final response = await http.post(
-      Uri.parse(tokenUrl),
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization':
-            'Basic ' + base64Encode(utf8.encode('$username:$password')),
-      },
-    );
-
-    if (response.statusCode == 200) {
-      print("here");
-      final token = response.body
-          .trim(); // Assuming the token is returned as a plain string
-      print(token);
-      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-      print(decodedToken);
-      String expiryDate =
-          DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000)
-              .toIso8601String();
-
-      print(expiryDate + token);
-
-      final tokenData = {
-        constants.accessTokenField: token,
-        constants.refreshTokenField:
-            '', // If your backend does not provide a refresh token, you can leave it empty
-        constants.tokenTypeField: 'Bearer', // Assuming the token type is Bearer
-        constants.expiryDateField:
-            expiryDate.toString(), // Convert expiry date to String
-      };
-
-      // Save the token to the database
-      final db = AppDatabase.instance;
-      await db.saveToken(tokenData);
-    } else {
-      throw Exception('Failed to authenticate');
-    }
-  }
 
   Future<List<CardDTO>> syncCards(cards) async {
     //var mobileCards = cards.map((card) => CardDTO.toJson(card)).toList();

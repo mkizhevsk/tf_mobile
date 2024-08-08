@@ -6,11 +6,13 @@ import 'package:tf_mobile/stream_manager.dart';
 import 'dart:async';
 import 'package:tf_mobile/services/app_initializer.dart';
 import 'package:logging/logging.dart';
+import 'package:tf_mobile/services/auth_service.dart';
+import 'package:tf_mobile/screens/login_screen.dart';
 
 void main() {
   _setupLogging();
   runApp(
-    const MaterialApp(home: MyHome()),
+    const MyApp(), //MaterialApp(home: MyHome()),
   );
 }
 
@@ -19,6 +21,32 @@ void _setupLogging() {
   Logger.root.onRecord.listen((LogRecord rec) {
     print('${rec.level.name}: ${rec.time}: ${rec.loggerName}: ${rec.message}');
   });
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Create an instance of AuthService
+    final authService = AuthService();
+
+    return MaterialApp(
+      home: FutureBuilder(
+        future: authService.authenticate(), // Call the method on the instance
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            print("snapshot.hasError");
+            return const LoginScreen(); // Navigate to the login screen if there's an error
+          } else {
+            return const MyHome(); // Navigate to the home screen if authentication is successful
+          }
+        },
+      ),
+    );
+  }
 }
 
 class MyHome extends StatefulWidget {
