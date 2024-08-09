@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tf_mobile/screens/others.dart';
 import 'screens/card_tab.dart';
 import 'screens/contacts.dart';
@@ -8,6 +9,7 @@ import 'package:tf_mobile/services/app_initializer.dart';
 import 'package:logging/logging.dart';
 import 'package:tf_mobile/services/auth_service.dart';
 import 'package:tf_mobile/screens/login_screen.dart';
+import 'package:tf_mobile/services/card_sync_service.dart';
 
 void main() {
   _setupLogging();
@@ -26,22 +28,47 @@ void _setupLogging() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  Future<bool> _isFirstLaunch() async {
+    final prefs = await SharedPreferences.getInstance();
+    final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+
+    if (isFirstLaunch) {
+      // Set 'isFirstLaunch' to false, so it won't be considered the first launch next time
+      await prefs.setBool('isFirstLaunch', false);
+    }
+
+    return isFirstLaunch;
+  }
+
   @override
   Widget build(BuildContext context) {
     // Create an instance of AuthService
     final authService = AuthService();
+    final CardSyncService cardSyncService = CardSyncService();
 
     return MaterialApp(
       home: FutureBuilder(
-        future: authService.authenticate(), // Call the method on the instance
+        future: _isFirstLaunch().then((isFirstLaunch) async {
+          // After checking if it's the first launch, authenticate
+          bool isAuthenticated = await authService.authenticate();
+
+          // If it's the first launch and authentication is successful, sync cards
+          if (isAuthenticated && isFirstLaunch) {
+            await cardSyncService
+                .fetchAndSyncCards(); //httpService.syncCards(localCards);
+          }
+
+          return isAuthenticated;
+        }),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            print("snapshot.hasError");
-            return const LoginScreen(); // Navigate to the login screen if there's an error
+          } else if (snapshot.hasError ||
+              (snapshot.hasData && !snapshot.data!)) {
+            // Navigate to the login screen if there's an error or no refresh token
+            return const LoginScreen();
           } else {
-            return const MyHome(); // Navigate to the home screen if authentication is successful
+            return const MyHome();
           }
         },
       ),

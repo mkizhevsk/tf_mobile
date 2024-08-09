@@ -9,7 +9,7 @@ class AuthService {
 
   AuthService();
 
-  Future<void> authenticate() async {
+  Future<bool> authenticate() async {
     print("Start authenticate()");
 
     const String username = 'dvega2';
@@ -18,12 +18,13 @@ class AuthService {
     // Retrieve the existing refresh token from the database
     final db = AppDatabase.instance;
     final tokenData = await db.getToken();
-    // final refreshToken =
-    //     "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiZHZlZ2E0IiwiZXhwIjoxNzI1NDU3MTMzLCJpYXQiOjE3MjI4NjUxMzN9.TKqZ8dgLgThE26DpJULZ_9rfxsVMapsfUN4MtKpOnu6TQvAXza6snq4_fLtLWwXGm9JlWexuyqLrMAbvZqoktQeUioqJlFWppBSJ-aOIuWxCeY-v96PjCj6QzhofJ4NFqbnaRePPO7-VwVgo0WUGo1NFCQz3RIZP3qrDEvdYd06po5zuHY8C454l4_Ax-AZrHmjMAu4itcZfZ5H4Rqk1xy6LTcozzplNTuuYkwqEwbnlQBUztv347-KzCQdBMyo3pmYLANfLvtl7sidhA_bdvD-xrZbOi_H36W3XLlXxFk1RdCwpvfms8buFwCw9RqfdyeOuqGQDv9tMDXRIizGFCg";
-    final refreshToken = tokenData?[constants.refreshTokenField];
+    final refreshToken =
+        "eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJzZWxmIiwic3ViIjoiZHZlZ2E0IiwiZXhwIjoxNzI1ODA0MTI0LCJpYXQiOjE3MjMyMTIxMjR9.vnwMqBfZynFsOkwT2jwPpeTAGY7pkzy7sXZ-jHhDcbjdnNJ6-YNXnTB38qlBBNs_LST556R7ekp9rlWNJ50Sf6qG5La9KMik-SKKDAh2nS8Tw36mH2B0ATvAyTpKxVgCLEpwnerAuS9vUYrV9BKviSsLJE7FSVLRX4M4pU-h5uzATN5Qc67yItwlYiqTpjbAxRHh-gZW8Yo8DFaWXP0PMDCt9OBp_zabIqVsH47CV_fMsbtzg-1oy4VlSeSG32alv7EK3GGb4qDTgixcG0_Lyk7vYaj8_T1eWU3dXHuib3fQnJI-mV3QOP7R0zSXQPQmISazZxB5lcHPwpAflG-pSA";
+    // final refreshToken = tokenData?[constants.refreshTokenField];
 
     if (refreshToken == null) {
-      throw Exception('No refresh token available for authentication');
+      // Return false to indicate that there's no refresh token and authentication failed
+      return false;
     }
 
     // Send the refresh token to get new tokens
@@ -42,12 +43,12 @@ class AuthService {
       final String newRefreshToken = tokens['refreshToken'].trim();
 
       // Decode the access token to extract the expiration date
-      Map<String, dynamic> decodedToken = JwtDecoder.decode(newAccessToken);
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(newRefreshToken);
       String expiryDate =
           DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000)
               .toIso8601String();
 
-      print("New access token expires at: $expiryDate");
+      print("New refresh token expires at: $expiryDate");
 
       // Save the new tokens to the database
       final updatedTokenData = {
@@ -56,10 +57,12 @@ class AuthService {
         constants.tokenTypeField: 'Bearer', // Assuming the token type is Bearer
         constants.expiryDateField: expiryDate,
       };
-
       await db.saveToken(updatedTokenData);
+
+      return true; // Authentication successful
     } else {
-      throw Exception('Failed to authenticate');
+      print('Failed to authenticate');
+      return false;
     }
   }
 }
