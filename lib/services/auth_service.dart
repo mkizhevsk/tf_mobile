@@ -6,8 +6,45 @@ import 'package:tf_mobile/database/app_database.dart';
 
 class AuthService {
   final String tokenUrl = 'https://mkizhevsk.ru/api/refresh-token';
+  final String requestCodeUrl = 'https://mkizhevsk.ru/api/request-code';
 
   AuthService();
+
+  // Method to request verification code
+  Future<void> requestCode(String username) async {
+    // Replace with your actual credentials
+    const String basicAuthUsername = 'dvega4';
+    const String basicAuthPassword = 'password';
+
+    // Encode the username and password to Base64 for Basic Auth
+    String basicAuth = 'Basic ' +
+        base64Encode(utf8.encode('$basicAuthUsername:$basicAuthPassword'));
+
+    // Construct the URL with the username as a query parameter
+    final urlWithParams = '$requestCodeUrl?username=$username';
+
+    try {
+      final response = await http.post(
+        Uri.parse(urlWithParams),
+        headers: <String, String>{
+          'Authorization': basicAuth,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final String message = responseData['message'];
+        print(
+            'Server response message: $message'); // This will print the message to the console
+      } else {
+        print('Failed to request code. Status code: ${response.statusCode}');
+        // Handle other status codes or errors
+      }
+    } catch (e) {
+      print('An error occurred while requesting code: $e');
+      // Handle exception
+    }
+  }
 
   Future<bool> authenticate() async {
     print("Start authenticate()");
