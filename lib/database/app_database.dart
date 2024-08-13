@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 const String fileName = "tasks_database.db";
 
@@ -140,14 +141,29 @@ class AppDatabase {
   //     constants.expiryDateField: expiryDate,
   //   });
   // }
-  Future<void> saveToken(Map<String, dynamic> token) async {
+  Future<void> saveToken(String accessToken, String refreshToken) async {
     final db = await instance.database;
+
+    // Decode the refresh token to extract the expiration date
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(refreshToken);
+    String expiryDate =
+        DateTime.fromMillisecondsSinceEpoch(decodedToken['exp'] * 1000)
+            .toIso8601String();
+    print("New refresh token expires at: $expiryDate");
+
+    // Create the token data map
+    final tokenData = {
+      constants.accessTokenField: accessToken,
+      constants.refreshTokenField: refreshToken,
+      constants.tokenTypeField: 'Bearer', // Assuming the token type is Bearer
+      constants.expiryDateField: expiryDate,
+    };
 
     // Clear previous tokens
     await db.delete(constants.tokenTableName);
 
     // Insert new token
-    await db.insert(constants.tokenTableName, token);
+    await db.insert(constants.tokenTableName, tokenData);
   }
 
   Future<Map<String, String>?> getToken() async {

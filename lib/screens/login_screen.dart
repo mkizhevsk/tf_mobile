@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tf_mobile/services/auth_service.dart';
-import 'package:tf_mobile/main.dart';
-import 'package:tf_mobile/services/app_initializer.dart';
+import 'package:tf_mobile/screens/enter_code_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -21,9 +20,15 @@ class _LoginScreenState extends State<LoginScreen> {
       String username = _usernameController.text;
 
       // Call the AuthService to request the verification code
-      await _authService.requestCode(username);
-
-      print('Requested verification code for username: $username');
+      bool reustltSuccessful = await _authService.requestCode(username);
+      if (reustltSuccessful) {
+        // Navigate to EnterCodeScreen after successful response
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => EnterCodeScreen(username: username),
+          ),
+        );
+      }
     }
   }
 
