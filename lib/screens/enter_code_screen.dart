@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tf_mobile/services/auth_service.dart';
+import 'package:tf_mobile/services/card_sync_service.dart';
+import 'package:tf_mobile/main.dart';
 
 class EnterCodeScreen extends StatefulWidget {
   final String username;
@@ -14,6 +16,7 @@ class _EnterCodeScreenState extends State<EnterCodeScreen> {
   final TextEditingController _codeController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final AuthService _authService = AuthService();
+  final CardSyncService cardSyncService = CardSyncService();
 
   void _submitCode() async {
     if (_formKey.currentState!.validate()) {
@@ -22,7 +25,20 @@ class _EnterCodeScreenState extends State<EnterCodeScreen> {
       print('Submitted code: $code');
       // Example: Call an authentication service with the code
 
-      await _authService.processCode(widget.username, code);
+      bool resultSuccessful =
+          await _authService.processCode(widget.username, code);
+      if (resultSuccessful) {
+        await cardSyncService.fetchAndSyncCards();
+
+        if (mounted) {
+          // Navigate to MyHome screen
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const MyHome(), // Ensure MyHome is imported
+            ),
+          );
+        }
+      }
     }
   }
 

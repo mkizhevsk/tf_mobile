@@ -20,8 +20,8 @@ class _LoginScreenState extends State<LoginScreen> {
       String username = _usernameController.text;
 
       // Call the AuthService to request the verification code
-      bool reustltSuccessful = await _authService.requestCode(username);
-      if (reustltSuccessful) {
+      bool resultSuccessful = await _authService.requestCode(username);
+      if (mounted && resultSuccessful) {
         // Navigate to EnterCodeScreen after successful response
         Navigator.of(context).push(
           MaterialPageRoute(
