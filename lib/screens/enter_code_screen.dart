@@ -25,9 +25,8 @@ class _EnterCodeScreenState extends State<EnterCodeScreen> {
       print('Submitted code: $code');
       // Example: Call an authentication service with the code
 
-      bool resultSuccessful =
-          await _authService.processCode(widget.username, code);
-      if (resultSuccessful) {
+      int statusCode = await _authService.processCode(widget.username, code);
+      if (statusCode == 200) {
         await cardSyncService.fetchAndSyncCards();
 
         if (mounted) {
@@ -38,7 +37,22 @@ class _EnterCodeScreenState extends State<EnterCodeScreen> {
             ),
           );
         }
+      } else if (statusCode == 498) {
+        _showMessage("The verification code you entered is invalid");
+      } else if (statusCode == 498) {
+        _showMessage("The verification code has expired");
       }
+    }
+  }
+
+  void _showMessage(String message) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red, // Optional: set a background color
+        ),
+      );
     }
   }
 

@@ -52,7 +52,7 @@ class AuthService {
   }
 
   // Method to process the verification code
-  Future<bool> processCode(String username, String code) async {
+  Future<int> processCode(String username, String code) async {
     print("Start processCode: $username, $code");
 
     final String urlWithParams =
@@ -63,7 +63,10 @@ class AuthService {
       final response = await http.post(
         Uri.parse(urlWithParams),
       );
-
+      print("statusCode " +
+          response.statusCode.toString() +
+          " " +
+          response.body.toString());
       if (response.statusCode == 200) {
         // Decode the JSON response to extract tokens
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -73,12 +76,8 @@ class AuthService {
 
         // Save the new tokens to the database
         await db.saveToken(accessToken, refreshToken);
-
-        return true;
-      } else {
-        print('Failed to process code. Status code: ${response.statusCode}');
-        throw Exception('Failed to process code.');
       }
+      return response.statusCode;
     } catch (e) {
       print('An error occurred while processing the code: $e');
       throw Exception('An error occurred while processing the code: $e');
