@@ -1,7 +1,7 @@
 // api
 const String apiLogin = "login";
 const String apiPassword = "password";
-const String apiUrl = "url";
+const String apiUrl = "https://wordnest.online";
 
 // Database column types
 const String idType = "INTEGER PRIMARY KEY AUTOINCREMENT";
