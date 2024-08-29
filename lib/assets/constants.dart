@@ -1,3 +1,8 @@
+// api
+const String apiLogin = "login";
+const String apiPassword = "password";
+const String apiUrl = "url";
+
 // Database column types
 const String idType = "INTEGER PRIMARY KEY AUTOINCREMENT";
 const String textTypeNullable = "TEXT";

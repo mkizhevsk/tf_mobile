@@ -5,11 +5,10 @@ import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/utils/date_util.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
 import 'package:tf_mobile/database/app_database.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 
 class HttpService {
-  final String cardsUrl = 'https://mkizhevsk.ru/api';
-  final String tokenUrl = 'https://mkizhevsk.ru/api/token';
+  final String cardsUrl = '${constants.apiUrl}/api';
+  final String tokenUrl = '${constants.apiUrl}/api/token';
 
   HttpService();
 

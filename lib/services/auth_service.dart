@@ -4,9 +4,9 @@ import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
 
 class AuthService {
-  final String tokenUrl = 'https://mkizhevsk.ru/api/refresh-token';
-  final String requestCodeUrl = 'https://mkizhevsk.ru/api/request-code';
-  final String processCodeUrl = 'https://mkizhevsk.ru/api/process-code';
+  final String tokenUrl = '${constants.apiUrl}/api/refresh-token';
+  final String requestCodeUrl = '${constants.apiUrl}/api/request-code';
+  final String processCodeUrl = '${constants.apiUrl}/api/process-code';
 
   AuthService();
 
@@ -15,8 +15,8 @@ class AuthService {
     print('Start requestCode: $username');
 
     // Replace with your actual credentials
-    const String basicAuthUsername = 'dvega4';
-    const String basicAuthPassword = 'password';
+    const String basicAuthUsername = constants.apiLogin;
+    const String basicAuthPassword = constants.apiPassword;
 
     // Encode the username and password to Base64 for Basic Auth
     String basicAuth = 'Basic ' +
