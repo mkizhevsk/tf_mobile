@@ -26,7 +26,7 @@ class HttpService {
     final tokenData = await db.getToken();
 
     final response = await http.post(
-      Uri.parse('$cardsUrl/cards/sync'),
+      Uri.parse('$cardsUrl/decks/sync'),
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
         if (tokenData != null)

@@ -64,7 +64,8 @@ class AppDatabase {
     final db = await database;
 
     // Fetching all decks from the 'decks' table
-    final List<Map<String, dynamic>> deckMaps = await db.query('decks');
+    final List<Map<String, dynamic>> deckMaps =
+        await db.query(constants.deckTableName);
 
     // Converting the list of maps to a list of DeckEntity objects
     return List.generate(deckMaps.length, (i) {
