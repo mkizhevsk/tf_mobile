@@ -3,6 +3,7 @@ import 'package:path/path.dart';
 import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:tf_mobile/model/entity/deck.dart';
 
 const String fileName = "tasks_database.db";
 
@@ -20,6 +21,15 @@ class AppDatabase {
   }
 
   Future _createDB(Database db, int version) async {
+    await db.execute('''
+      CREATE TABLE ${constants.deckTableName} (
+        ${constants.deckIdField} ${constants.idType},
+        ${constants.deckNameField} ${constants.textType},
+        ${constants.deckInternalCodeField} ${constants.textType},
+        ${constants.deckEditDateTimeField} ${constants.textType}
+      )
+    ''');
+
     await db.execute('''
       CREATE TABLE ${constants.cardTableName} (
         ${constants.cardIdField} ${constants.idType},
@@ -47,6 +57,19 @@ class AppDatabase {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, fileName);
     return await openDatabase(path, version: 1, onCreate: _createDB);
+  }
+
+  // Deck
+  Future<List<DeckEntity>> getDecks() async {
+    final db = await database;
+
+    // Fetching all decks from the 'decks' table
+    final List<Map<String, dynamic>> deckMaps = await db.query('decks');
+
+    // Converting the list of maps to a list of DeckEntity objects
+    return List.generate(deckMaps.length, (i) {
+      return DeckEntity.fromJson(deckMaps[i]);
+    });
   }
 
   // Card

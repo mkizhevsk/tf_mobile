@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tf_mobile/screens/others.dart';
 import 'screens/card_tab.dart';
 import 'screens/contacts.dart';
-import 'package:tf_mobile/stream_manager.dart';
 import 'dart:async';
 import 'package:tf_mobile/services/app_initializer.dart';
 import 'package:logging/logging.dart';
@@ -14,7 +13,7 @@ import 'package:tf_mobile/services/card_sync_service.dart';
 void main() {
   _setupLogging();
   runApp(
-    const MyApp(), //MaterialApp(home: MyHome()),
+    const MyApp(),
   );
 }
 
@@ -30,13 +29,12 @@ class MyApp extends StatelessWidget {
 
   Future<bool> _isFirstLaunch() async {
     final prefs = await SharedPreferences.getInstance();
-    final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
 
+    final isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
     if (isFirstLaunch) {
       // Set 'isFirstLaunch' to false, so it won't be considered the first launch next time
       await prefs.setBool('isFirstLaunch', false);
     }
-
     return isFirstLaunch;
   }
 
@@ -54,8 +52,7 @@ class MyApp extends StatelessWidget {
 
           // If it's the first launch and authentication is successful, sync cards
           if (isAuthenticated && isFirstLaunch) {
-            await cardSyncService
-                .fetchAndSyncCards(); //httpService.syncCards(localCards);
+            await cardSyncService.fetchAndSyncCards();
           }
 
           return isAuthenticated;
@@ -87,8 +84,6 @@ class MyHomeState extends State<MyHome> {
   late int _currentIndex;
   int cardTabCardId = 0;
 
-  StreamSubscription<int>? _cardIdSubscription;
-
   List<Widget> body = [
     const CardTab(),
     const ContactTab(),
@@ -101,13 +96,6 @@ class MyHomeState extends State<MyHome> {
     super.initState();
     _currentIndex = 0;
 
-    _cardIdSubscription = StreamManager().cardIdStream.listen((cardId) {
-      setState(() {
-        cardTabCardId = cardId;
-        print('MyHomeState Received cardId: $cardId');
-      });
-    });
-
     // Schedule the method to run after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       AppInitializer.runAfterStart();
@@ -116,7 +104,6 @@ class MyHomeState extends State<MyHome> {
 
   @override
   void dispose() {
-    _cardIdSubscription?.cancel();
     super.dispose();
   }
 

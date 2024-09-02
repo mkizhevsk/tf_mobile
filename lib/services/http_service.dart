@@ -5,6 +5,7 @@ import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/utils/date_util.dart';
 import 'package:tf_mobile/assets/constants.dart' as constants;
 import 'package:tf_mobile/database/app_database.dart';
+import 'package:tf_mobile/model/dto/deck_dto.dart';
 
 class HttpService {
   final String cardsUrl = '${constants.apiUrl}/api';
@@ -12,13 +13,14 @@ class HttpService {
 
   HttpService();
 
-  Future<List<CardDTO>> syncCards(cards) async {
-    //var mobileCards = cards.map((card) => CardDTO.toJson(card)).toList();
-    var mobileCards =
-        cards.map((card) => CardDTO.fromEntity(card).toJson()).toList();
-    for (var card in mobileCards) {
-      print(card);
-    }
+  Future<List<CardDTO>> syncDecks(decks) async {
+    var mobileDecks =
+        decks.map((deck) => DeckDTO.fromEntity(deck).toJson()).toList();
+    // var mobileCards =
+    //     cards.map((card) => CardDTO.fromEntity(card).toJson()).toList();
+    // for (var card in mobileCards) {
+    //   print(card);
+    // }
 
     final db = AppDatabase.instance;
     final tokenData = await db.getToken();
@@ -30,7 +32,7 @@ class HttpService {
         if (tokenData != null)
           'Authorization': 'Bearer ${tokenData[constants.accessTokenField]}',
       },
-      body: jsonEncode(mobileCards),
+      body: jsonEncode(mobileDecks),
     );
 
     String responseBody = utf8.decode(response.bodyBytes);

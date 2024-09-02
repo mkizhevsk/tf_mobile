@@ -6,16 +6,6 @@ const String cardBackJsonName = "back";
 const String cardExampleJsonName = "example";
 const String cardStatusJsonName = "status";
 
-// const List<String> cardColumns = [
-//   cardIdField,
-//   cardInternalCodeField,
-//   cardEditDateTimeField,
-//   cardFrontField,
-//   cardBackField,
-//   cardExampleField,
-//   cardStatusField,
-// ];
-
 class CardEntity {
   int? id;
   late String internalCode;

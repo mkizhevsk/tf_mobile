@@ -23,8 +23,6 @@ class CardTabState extends State<CardTab> {
   late Future<CardEntity> cardFuture;
   int _cardId = 0;
 
-  StreamSubscription<int>? _cardIdSubscription;
-
   final HttpService httpService = HttpService();
 
   @override
@@ -32,13 +30,6 @@ class CardTabState extends State<CardTab> {
     print('initState of CardTabState');
     super.initState();
     db = AppDatabase.instance;
-
-    _cardIdSubscription = StreamManager().cardIdStream.listen((cardId) {
-      print('CardTabState Received cardId: $cardId');
-      setState(() {
-        _cardId = cardId;
-      });
-    });
 
     _fetchCard();
   }

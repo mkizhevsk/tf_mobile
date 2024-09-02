@@ -5,6 +5,7 @@ import 'package:tf_mobile/model/dto/card_dto.dart';
 import 'package:tf_mobile/utils/date_util.dart';
 import 'dart:async';
 import 'package:logging/logging.dart';
+import 'package:tf_mobile/model/entity/deck.dart';
 
 class CardSyncService {
   final Logger _logger = Logger('CardSyncService');
@@ -12,26 +13,26 @@ class CardSyncService {
 
   Future<void> fetchAndSyncCards() async {
     try {
-      List<CardEntity> localCards = await AppDatabase.instance.getCards();
-      _logger.info('Fetched ${localCards.length} cards from local database');
+      List<DeckEntity> localDecks = await AppDatabase.instance.getDecks();
+      _logger.info('Fetched ${localDecks.length} cards from local database');
 
       // Sync fetched cards with server
-      await syncCardsWithServer(localCards);
+      await syncCardsWithServer(localDecks);
     } catch (error) {
       _logger.severe('Error fetching or syncing cards: $error');
     }
   }
 
-  Future<void> syncCardsWithServer(List<CardEntity> localCards) async {
+  Future<void> syncCardsWithServer(List<DeckEntity> localDecks) async {
     try {
-      List<CardDTO> webCardDtoList = await httpService.syncCards(localCards);
+      List<CardDTO> webCardDtoList = await httpService.syncDecks(localDecks);
       _logger.info('Received webCardDtos: ${webCardDtoList.length}');
 
       for (var webCardDto in webCardDtoList) {
         _logger.fine(
             'Web Card: ${webCardDto.internalCode}, ${webCardDto.front}, ${webCardDto.back}, ${webCardDto.example}, ${webCardDto.status}, ${webCardDto.editDateTime}');
 
-        await _processCard(localCards, webCardDto);
+        await _processCard(localDecks, webCardDto);
       }
     } catch (error) {
       _logger.severe('Error syncing cards with server: $error');
@@ -39,7 +40,7 @@ class CardSyncService {
   }
 
   Future<void> _processCard(
-      List<CardEntity> localCards, CardDTO webCardDto) async {
+      List<DeckEntity> localCards, CardDTO webCardDto) async {
     bool isPresent = false;
     CardEntity webCard = _createCardEntity(webCardDto);
 

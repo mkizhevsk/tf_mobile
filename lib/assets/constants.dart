@@ -10,6 +10,13 @@ const String textType = "TEXT NOT NULL";
 const String intTypeNullable = "INTEGER";
 const String boolType = "BOOLEAN NOT NULL";
 
+// Deck table constants
+const String deckTableName = "deck";
+const String deckIdField = "id";
+const String deckNameField = "name";
+const String deckInternalCodeField = "internal_code";
+const String deckEditDateTimeField = "edit_date_time";
+
 // Card table constants
 const String cardTableName = "card";
 const String cardIdField = "id";
@@ -19,6 +26,7 @@ const String cardFrontField = "front";
 const String cardBackField = "back";
 const String cardExampleField = "example";
 const String cardStatusField = "status";
+const String cardDeckIdField = "deck_id";
 
 // Token table constants
 const String tokenTableName = "token";
