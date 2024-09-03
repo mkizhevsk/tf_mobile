@@ -15,20 +15,20 @@ class CardSyncService {
   Future<void> fetchAndSyncCards() async {
     try {
       List<DeckEntity> localDecks = await AppDatabase.instance.getDecks();
-      _logger.info('Fetched ${localDecks.length} cards from local database');
+      _logger.info(
+          'start fetchAndSyncCards, fetched ${localDecks.length} decks from local database');
 
-      // create List<DeckDTO>
-
-      // Sync fetched cards with server
+      // Sync fetched local decks with server
       await syncDecksWithServer(localDecks);
     } catch (error) {
-      _logger.severe('Error fetching or syncing cards: $error');
+      _logger.severe('Error fetching or syncing decks: $error');
     }
   }
 
   Future<void> syncDecksWithServer(List<DeckEntity> localDecks) async {
     try {
-      var localDeckDTOs = await getLocalDeckDTOs(localDecks);
+      var localDeckDTOs = await _getLocalDeckDTOs(localDecks);
+      print('localDeckDTOs ${localDeckDTOs.length}');
 
       List<DeckDTO> webDeckDtoList = await httpService.syncDecks(localDeckDTOs);
       _logger.info('Received webDeckDtos: ${webDeckDtoList.length}');
@@ -46,10 +46,25 @@ class CardSyncService {
     }
   }
 
-  Future<List<DeckDTO>> getLocalDeckDTOs(List<DeckEntity> localDecks) async {
+  Future<List<DeckDTO>> _getLocalDeckDTOs(List<DeckEntity> localDecks) async {
     List<DeckDTO> localDeckDTOs = [];
+    List<CardEntity> localCards = await AppDatabase.instance.getCards();
+    _logger.info(
+        'Start _getLocalDeckDTOs, fetched ${localCards.length} cards from local database');
 
-    // some logic here
+    for (var deck in localDecks) {
+      List<CardDTO> deckCardDTOs = [];
+      for (var card in localCards) {
+        if (card.deckId == deck.id) {
+          var cardDTO = CardDTO.fromEntity(card);
+          deckCardDTOs.add(cardDTO);
+        }
+      }
+
+      DeckDTO deckDTO = DeckDTO.fromEntity(deck, deckCardDTOs);
+
+      localDeckDTOs.add(deckDTO);
+    }
 
     return localDeckDTOs;
   }
@@ -110,7 +125,12 @@ class CardSyncService {
 
   Future<void> _processWebCards(List<DeckDTO> webDeckDtoList) async {
     List<CardEntity> localCards = await AppDatabase.instance.getCards();
-    _logger.info('Fetched ${localCards.length} cards from local database');
+    _logger.info(
+        'Start _processWebCards, fetched ${localCards.length} cards from local database');
+    for (var card in localCards) {
+      print(
+          '${card.id}, ${card.deckId}, ${card.internalCode}, ${card.editDateTime}, ${card.front}, ${card.back}, ${card.example}, ${card.status}');
+    }
 
     for (var webDeckDto in webDeckDtoList) {
       for (var webCardDto in webDeckDto.cards) {
@@ -124,27 +144,32 @@ class CardSyncService {
     DeckEntity deck =
         await AppDatabase.instance.getDeckByInternalCode(deckInternalCode);
     bool isPresent = false;
-    CardEntity webCard = _createCardEntity(webCardDto);
+    CardEntity card = _createCardEntity(webCardDto, deck.id!);
 
     for (var localCard in localCards) {
-      if (localCard.internalCode == webCard.internalCode) {
+      if (localCard.internalCode == card.internalCode) {
         isPresent = true;
         if (webCardDto.deleted) {
           await _deleteCard(localCard.internalCode);
-        } else if (webCard.editDateTime.isAfter(localCard.editDateTime)) {
-          await _updateCard(webCard);
+        } else if (card.editDateTime.isAfter(localCard.editDateTime)) {
+          await AppDatabase.instance.updateCard(card);
+          _logger.info(
+              'Updated local card with internalCode: ${card.internalCode}');
         }
         break;
       }
     }
 
     if (!isPresent && !webCardDto.deleted) {
-      await _createCard(webCard, deck.id!);
+      await AppDatabase.instance.createCard(card);
+      _logger.info(
+          'Created new local card:  ${card.id}, ${card.deckId}, ${card.internalCode}, ${card.editDateTime}, ${card.front}, ${card.back}, ${card.example}, ${card.status}');
     }
   }
 
-  CardEntity _createCardEntity(CardDTO cardDto) {
+  CardEntity _createCardEntity(CardDTO cardDto, int deckId) {
     return CardEntity(
+      deckId: deckId,
       internalCode: cardDto.internalCode,
       editDateTime: DateUtil.stringToDateTime(cardDto.editDateTime),
       front: cardDto.front,
@@ -160,17 +185,5 @@ class CardSyncService {
     if (result > 0) {
       _logger.info("Card with internalCode $internalCode was deleted");
     }
-  }
-
-  Future<void> _updateCard(CardEntity webCard) async {
-    await AppDatabase.instance.updateCard(webCard);
-    _logger
-        .info('Updated local card with internalCode: ${webCard.internalCode}');
-  }
-
-  Future<void> _createCard(CardEntity webCard, int deckId) async {
-    await AppDatabase.instance.createCard(webCard);
-    _logger.info(
-        'Created new local card with internalCode: ${webCard.internalCode}');
   }
 }

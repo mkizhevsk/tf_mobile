@@ -33,6 +33,7 @@ class AppDatabase {
     await db.execute('''
       CREATE TABLE ${constants.cardTableName} (
         ${constants.cardIdField} ${constants.idType},
+        ${constants.cardDeckIdField} ${constants.intTypeNullable},
         ${constants.cardInternalCodeField} ${constants.textType},
         ${constants.cardEditDateTimeField} ${constants.textType},
         ${constants.cardFrontField} ${constants.textTypeNullable},

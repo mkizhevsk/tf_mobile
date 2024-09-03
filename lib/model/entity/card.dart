@@ -1,13 +1,17 @@
-const String cardIdJsonName = "id";
-const String cardInternalCodeJsonName = "internal_code";
-const String cardEditDateTimeJsonName = "edit_date_time";
-const String cardFrontJsonName = "front";
-const String cardBackJsonName = "back";
-const String cardExampleJsonName = "example";
-const String cardStatusJsonName = "status";
+import 'package:tf_mobile/assets/constants.dart' as constants;
+
+// const String cardIdJsonName = "id";
+// const String cardDeckIdJsonName = "deck_id";
+// const String cardInternalCodeJsonName = "internal_code";
+// const String cardEditDateTimeJsonName = "edit_date_time";
+// const String cardFrontJsonName = "front";
+// const String cardBackJsonName = "back";
+// const String cardExampleJsonName = "example";
+// const String cardStatusJsonName = "status";
 
 class CardEntity {
   int? id;
+  int? deckId;
   late String internalCode;
   late DateTime editDateTime;
   String? front;
@@ -17,6 +21,7 @@ class CardEntity {
 
   CardEntity({
     this.id,
+    this.deckId,
     required this.internalCode,
     required this.editDateTime,
     this.front,
@@ -28,23 +33,26 @@ class CardEntity {
   CardEntity.empty();
 
   static CardEntity fromJson(Map<String, dynamic> json) => CardEntity(
-        id: json[cardIdJsonName] as int,
-        internalCode: json[cardInternalCodeJsonName] as String,
-        editDateTime: DateTime.parse(json[cardEditDateTimeJsonName] as String),
-        front: json[cardFrontJsonName] as String?,
-        back: json[cardBackJsonName] as String?,
-        example: json[cardExampleJsonName] as String?,
-        status: json[cardStatusJsonName] as int?,
+        id: json[constants.cardIdField] as int,
+        deckId: json[constants.cardDeckIdField] as int,
+        internalCode: json[constants.cardInternalCodeField] as String,
+        editDateTime:
+            DateTime.parse(json[constants.cardEditDateTimeField] as String),
+        front: json[constants.cardFrontField] as String?,
+        back: json[constants.cardBackField] as String?,
+        example: json[constants.cardExampleField] as String?,
+        status: json[constants.cardStatusField] as int?,
       );
 
   Map<String, dynamic> toJson() => {
-        cardIdJsonName: id,
-        cardInternalCodeJsonName: internalCode,
-        cardEditDateTimeJsonName: editDateTime.toIso8601String(),
-        cardFrontJsonName: front,
-        cardBackJsonName: back,
-        cardExampleJsonName: example,
-        cardStatusJsonName: status,
+        constants.cardIdField: id,
+        constants.cardDeckIdField: deckId,
+        constants.cardInternalCodeField: internalCode,
+        constants.cardEditDateTimeField: editDateTime.toIso8601String(),
+        constants.cardFrontField: front,
+        constants.cardBackField: back,
+        constants.cardExampleField: example,
+        constants.cardStatusField: status,
       };
 
   CardEntity copyWith({

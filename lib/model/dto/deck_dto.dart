@@ -3,16 +3,16 @@ import 'package:tf_mobile/model/dto/card_dto.dart';
 import 'package:tf_mobile/utils/date_util.dart';
 
 class DeckDTO {
+  final String name;
   final String internalCode;
   final String editDateTime;
-  final String name;
   final bool deleted;
   final List<CardDTO> cards;
 
   DeckDTO({
+    required this.name,
     required this.internalCode,
     required this.editDateTime,
-    required this.name,
     required this.deleted,
     required this.cards,
   });

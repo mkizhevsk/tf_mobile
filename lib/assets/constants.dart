@@ -20,13 +20,13 @@ const String deckEditDateTimeField = "edit_date_time";
 // Card table constants
 const String cardTableName = "card";
 const String cardIdField = "id";
+const String cardDeckIdField = "deck_id";
 const String cardInternalCodeField = "internal_code";
 const String cardEditDateTimeField = "edit_date_time";
 const String cardFrontField = "front";
 const String cardBackField = "back";
 const String cardExampleField = "example";
 const String cardStatusField = "status";
-const String cardDeckIdField = "deck_id";
 
 // Token table constants
 const String tokenTableName = "token";
