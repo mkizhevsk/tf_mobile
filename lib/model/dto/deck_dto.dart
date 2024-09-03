@@ -39,15 +39,13 @@ class DeckDTO {
     };
   }
 
-  static DeckDTO fromEntity(DeckEntity entity) {
+  static DeckDTO fromEntity(DeckEntity entity, List<CardDTO> cards) {
     return DeckDTO(
       internalCode: entity.internalCode,
       name: entity.name,
       editDateTime: DateUtil.dateTimeToString(entity.editDateTime),
-      deleted: entity.deleted,
-      cards: entity.cards
-          .map((cardEntity) => CardDTO.fromEntity(cardEntity))
-          .toList(),
+      deleted: false,
+      cards: cards,
     );
   }
 }

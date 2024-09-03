@@ -60,6 +60,12 @@ class AppDatabase {
   }
 
   // Deck
+  Future<DeckEntity> createDeck(DeckEntity deck) async {
+    final db = await instance.database;
+    final id = await db.insert(constants.deckTableName, deck.toJson());
+    return deck.copyWith(id: id);
+  }
+
   Future<List<DeckEntity>> getDecks() async {
     final db = await database;
 
@@ -71,6 +77,24 @@ class AppDatabase {
     return List.generate(deckMaps.length, (i) {
       return DeckEntity.fromJson(deckMaps[i]);
     });
+  }
+
+  Future<DeckEntity> getDeckByInternalCode(String internalCode) async {
+    final db = await instance.database;
+
+    // Query the deck table to find a deck with the specified internal code
+    final result = await db.query(
+      'deck', // Assuming the table name is 'deck'
+      where: 'internal_code = ?',
+      whereArgs: [internalCode],
+    );
+
+    // Check if any deck was found and return it as a DeckEntity
+    if (result.isNotEmpty) {
+      return DeckEntity.fromJson(result.first);
+    } else {
+      throw Exception('No deck found with internal code $internalCode');
+    }
   }
 
   // Card

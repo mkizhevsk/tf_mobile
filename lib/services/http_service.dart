@@ -13,15 +13,7 @@ class HttpService {
 
   HttpService();
 
-  Future<List<CardDTO>> syncDecks(decks) async {
-    var mobileDecks =
-        decks.map((deck) => DeckDTO.fromEntity(deck).toJson()).toList();
-    // var mobileCards =
-    //     cards.map((card) => CardDTO.fromEntity(card).toJson()).toList();
-    // for (var card in mobileCards) {
-    //   print(card);
-    // }
-
+  Future<List<DeckDTO>> syncDecks(List<DeckDTO> mobileDeckDTOs) async {
     final db = AppDatabase.instance;
     final tokenData = await db.getToken();
 
@@ -32,17 +24,18 @@ class HttpService {
         if (tokenData != null)
           'Authorization': 'Bearer ${tokenData[constants.accessTokenField]}',
       },
-      body: jsonEncode(mobileDecks),
+      body: jsonEncode(mobileDeckDTOs),
     );
 
     String responseBody = utf8.decode(response.bodyBytes);
-    print(responseBody);
+    //print("responseBody: " + responseBody);
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(responseBody);
-      List<CardDTO> cardDTOList =
-          body.map((dynamic item) => CardDTO.fromJson(item)).toList();
-      return cardDTOList;
+      List<DeckDTO> deckDTOList =
+          body.map((dynamic item) => DeckDTO.fromJson(item)).toList();
+      print("deckDTOList.length " + deckDTOList.length.toString());
+      return deckDTOList;
     } else {
       throw Exception('Failed to load cards');
     }

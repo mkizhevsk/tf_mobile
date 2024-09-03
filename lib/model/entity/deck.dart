@@ -12,16 +12,12 @@ class DeckEntity {
   late String name;
   late String internalCode;
   late DateTime editDateTime;
-  bool deleted = false;
-  List<CardEntity> cards = [];
 
   DeckEntity({
     this.id,
     required this.name,
     required this.internalCode,
     required this.editDateTime,
-    this.deleted = false,
-    this.cards = const [],
   });
 
   DeckEntity.empty();
@@ -31,11 +27,6 @@ class DeckEntity {
         name: json[deckNameJsonName] as String,
         internalCode: json[deckInternalCodeJsonName] as String,
         editDateTime: DateTime.parse(json[deckEditDateTimeJsonName] as String),
-        deleted: json[deckDeletedJsonName] as bool? ?? false,
-        cards: (json[deckCardsJsonName] as List<dynamic>?)
-                ?.map((cardJson) => CardEntity.fromJson(cardJson))
-                .toList() ??
-            [],
       );
 
   Map<String, dynamic> toJson() => {
@@ -43,8 +34,6 @@ class DeckEntity {
         deckNameJsonName: name,
         deckInternalCodeJsonName: internalCode,
         deckEditDateTimeJsonName: editDateTime.toIso8601String(),
-        deckDeletedJsonName: deleted,
-        deckCardsJsonName: cards.map((card) => card.toJson()).toList(),
       };
 
   DeckEntity copyWith({
@@ -52,20 +41,16 @@ class DeckEntity {
     String? name,
     String? internalCode,
     DateTime? editDateTime,
-    bool? deleted,
-    List<CardEntity>? cards,
   }) =>
       DeckEntity(
         id: id ?? this.id,
         name: name ?? this.name,
         internalCode: internalCode ?? this.internalCode,
         editDateTime: editDateTime ?? this.editDateTime,
-        deleted: deleted ?? this.deleted,
-        cards: cards ?? this.cards,
       );
 
   @override
   String toString() {
-    return '$id, $name, $internalCode, $editDateTime, $deleted, Cards: [${cards.join(', ')}]';
+    return '$id, $name, $internalCode, $editDateTime';
   }
 }
