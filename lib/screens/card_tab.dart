@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/screens/card_form.dart';
-import 'package:tf_mobile/stream_manager.dart';
 import 'package:tf_mobile/main.dart';
 import 'package:tf_mobile/screens/card_row.dart';
 import 'package:tf_mobile/design/colors.dart';
@@ -21,8 +20,6 @@ class CardTab extends StatefulWidget {
 class CardTabState extends State<CardTab> {
   late AppDatabase db;
   late Future<CardEntity> cardFuture;
-  int _cardId = 0;
-
   final HttpService httpService = HttpService();
 
   @override
@@ -30,14 +27,15 @@ class CardTabState extends State<CardTab> {
     print('initState of CardTabState');
     super.initState();
     db = AppDatabase.instance;
-
     _fetchCard();
   }
 
   Future<void> _fetchCard() async {
     print('_fetchCard');
     try {
-      cardFuture = _cardId == 0 ? db.getCardToLearn() : db.getCard(_cardId);
+      setState(() {
+        cardFuture = db.getCardToLearn();
+      });
     } catch (e) {
       cardFuture = Future.error('No unlearned cards available');
     }
@@ -99,10 +97,12 @@ class CardTabState extends State<CardTab> {
             final card = snapshot.data!;
 
             return CardBody(
-                cardId: card.id!,
-                front: card.front!,
-                back: card.back!,
-                example: card.example!);
+              cardId: card.id!,
+              front: card.front!,
+              back: card.back!,
+              example: card.example!,
+              onNextCard: () => _fetchCard(), // Function to fetch next card
+            );
           }
         },
       ),
@@ -115,6 +115,7 @@ class CardBody extends StatelessWidget {
   final String front;
   final String back;
   final String example;
+  final VoidCallback onNextCard;
 
   const CardBody({
     super.key,
@@ -122,6 +123,7 @@ class CardBody extends StatelessWidget {
     required this.front,
     required this.back,
     required this.example,
+    required this.onNextCard,
   });
 
   @override
@@ -161,7 +163,10 @@ class CardBody extends StatelessWidget {
                 right: 10.0,
                 bottom: 0.0,
               ),
-              child: ButtomsRow(cardId: cardId),
+              child: ButtomsRow(
+                cardId: cardId,
+                onNextCard: onNextCard,
+              ),
             ),
           ],
         ),
@@ -205,10 +210,12 @@ class SearchRow extends StatelessWidget {
 
 class ButtomsRow extends StatelessWidget {
   final int cardId;
+  final VoidCallback onNextCard;
 
   const ButtomsRow({
     super.key,
     required this.cardId,
+    required this.onNextCard,
   });
 
   @override
@@ -226,11 +233,7 @@ class ButtomsRow extends StatelessWidget {
                   updatedCard.editDateTime = DateTime.now();
                   db.updateCardFromForm(updatedCard);
 
-                  StreamManager().cardIdSink.add(0);
-
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const MyHome()),
-                  );
+                  onNextCard(); // Call the callback to fetch the next card
                 },
                 child: const Icon(Icons.navigate_next)),
           ),
@@ -242,11 +245,7 @@ class ButtomsRow extends StatelessWidget {
                   updatedCard.status = constants.cardIsLearned;
                   db.updateCardFromForm(updatedCard);
 
-                  StreamManager().cardIdSink.add(0);
-
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const MyHome()),
-                  );
+                  onNextCard(); // Call the callback to fetch the next card
                 },
                 child: const Icon(Icons.done)),
           ),
