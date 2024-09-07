@@ -8,7 +8,7 @@ class CardRow extends StatefulWidget {
   final String back;
   final String example;
 
-  CardRow(
+  const CardRow(
       {required this.cardId,
       required this.front,
       required this.back,

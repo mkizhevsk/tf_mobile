@@ -34,7 +34,7 @@ class HttpService {
       List<dynamic> body = jsonDecode(responseBody);
       List<DeckDTO> deckDTOList =
           body.map((dynamic item) => DeckDTO.fromJson(item)).toList();
-      print("deckDTOList.length " + deckDTOList.length.toString());
+      print("deckDTOList.length ${deckDTOList.length}");
       return deckDTOList;
     } else {
       throw Exception('Failed to load cards');

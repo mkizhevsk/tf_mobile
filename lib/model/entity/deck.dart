@@ -1,5 +1,3 @@
-import 'card.dart';
-
 const String deckIdJsonName = "id";
 const String deckNameJsonName = "name";
 const String deckInternalCodeJsonName = "internal_code";

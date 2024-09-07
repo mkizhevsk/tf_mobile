@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:tf_mobile/database/app_database.dart';
 import 'package:tf_mobile/model/entity/card.dart';
 import 'package:tf_mobile/screens/card_form.dart';
-import 'package:tf_mobile/main.dart';
 import 'package:tf_mobile/screens/card_row.dart';
 import 'package:tf_mobile/design/colors.dart';
 import 'dart:async';

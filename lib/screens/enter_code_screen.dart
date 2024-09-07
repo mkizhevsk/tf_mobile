@@ -6,7 +6,7 @@ import 'package:tf_mobile/main.dart';
 class EnterCodeScreen extends StatefulWidget {
   final String username;
 
-  const EnterCodeScreen({Key? key, required this.username}) : super(key: key);
+  const EnterCodeScreen({super.key, required this.username});
 
   @override
   _EnterCodeScreenState createState() => _EnterCodeScreenState();

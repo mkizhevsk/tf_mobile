@@ -19,8 +19,8 @@ class AuthService {
     const String basicAuthPassword = constants.apiPassword;
 
     // Encode the username and password to Base64 for Basic Auth
-    String basicAuth = 'Basic ' +
-        base64Encode(utf8.encode('$basicAuthUsername:$basicAuthPassword'));
+    String basicAuth =
+        'Basic ${base64Encode(utf8.encode('$basicAuthUsername:$basicAuthPassword'))}';
 
     // Construct the URL with the username as a query parameter
     final urlWithParams = '$requestCodeUrl?username=$username';
@@ -63,16 +63,13 @@ class AuthService {
       final response = await http.post(
         Uri.parse(urlWithParams),
       );
-      print("statusCode " +
-          response.statusCode.toString() +
-          " " +
-          response.body.toString());
+      print("statusCode ${response.statusCode} ${response.body}");
       if (response.statusCode == 200) {
         // Decode the JSON response to extract tokens
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final String accessToken = responseData['accessToken'];
         final String refreshToken = responseData['refreshToken'];
-        print(accessToken + " " + refreshToken);
+        print("$accessToken $refreshToken");
 
         // Save the new tokens to the database
         await db.saveToken(accessToken, refreshToken);

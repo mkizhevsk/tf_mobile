@@ -25,7 +25,7 @@ void _setupLogging() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   Future<bool> _isFirstLaunch() async {
     final prefs = await SharedPreferences.getInstance();

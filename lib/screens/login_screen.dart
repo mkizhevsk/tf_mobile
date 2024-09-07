@@ -3,7 +3,7 @@ import 'package:tf_mobile/services/auth_service.dart';
 import 'package:tf_mobile/screens/enter_code_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
